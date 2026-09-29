@@ -11,13 +11,14 @@ export function AuthProvider({ children }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Intercept global fetch to attach Authorization header if token exists in sessionStorage
+    // Intercept global fetch to direct /api/* calls straight to the backend
     if (typeof window !== 'undefined') {
       const originalFetch = window.fetch;
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
       window.fetch = async function (url, options = {}) {
         let targetUrl = url;
-        if (typeof url === 'string' && url.startsWith('/api/')) {
-          const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
+        // Only rewrite relative /api/* calls — absolute URLs are left as-is
+        if (typeof url === 'string' && url.startsWith('/api/') && apiBase) {
           targetUrl = `${apiBase}${url}`;
         }
         const token = sessionStorage.getItem('token');
