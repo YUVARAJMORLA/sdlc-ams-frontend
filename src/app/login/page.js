@@ -74,27 +74,6 @@ export default function Login() {
                 </span>
               </div>
             </div>
-
-            {/* Bottom Glass Caption Card */}
-            <div style={{
-              background: 'rgba(10, 16, 26, 0.75)',
-              backdropFilter: 'blur(14px)',
-              border: '1px solid rgba(56, 189, 248, 0.28)',
-              borderRadius: '16px',
-              padding: '16px 20px',
-              marginTop: 'auto',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span className="material-icons" style={{ color: '#38bdf8', fontSize: '1.15rem' }}>auto_awesome</span>
-                <span style={{ color: '#ffffff', fontWeight: 800, fontSize: '0.92rem', letterSpacing: '-0.01em' }}>
-                  Autonomous Assessment Journey
-                </span>
-              </div>
-              <p style={{ color: 'rgba(224, 242, 254, 0.85)', fontSize: '0.8rem', margin: 0, lineHeight: 1.55 }}>
-                Closed-loop telemetry benchmarking SDLC engineering &amp; AMS operational workflows.
-              </p>
-            </div>
           </div>
         </div>
 

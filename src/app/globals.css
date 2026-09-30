@@ -1426,7 +1426,7 @@ select option {
   opacity: 1 !important;
   object-fit: cover;
   object-position: center;
-  filter: contrast(1.05) brightness(1.02);
+  filter: contrast(1.05) brightness(1.04);
 }
 
 .auth-showcase-overlay-signin {
@@ -1437,10 +1437,10 @@ select option {
   height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(10, 16, 26, 0.45) 0%,
-    rgba(10, 16, 26, 0.05) 25%,
-    rgba(10, 16, 26, 0.05) 70%,
-    rgba(10, 16, 26, 0.75) 100%
+    rgba(10, 16, 26, 0.3) 0%,
+    transparent 20%,
+    transparent 85%,
+    rgba(10, 16, 26, 0.15) 100%
   );
   pointer-events: none;
 }
@@ -1458,7 +1458,7 @@ select option {
   opacity: 1 !important;
   object-fit: cover;
   object-position: center;
-  filter: contrast(1.05) brightness(1.02);
+  filter: contrast(1.05) brightness(1.04);
 }
 
 .auth-showcase-overlay-signup {
@@ -1469,10 +1469,10 @@ select option {
   height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(10, 15, 26, 0.45) 0%,
-    rgba(10, 15, 26, 0.05) 25%,
-    rgba(10, 15, 26, 0.05) 70%,
-    rgba(10, 15, 26, 0.75) 100%
+    rgba(10, 15, 26, 0.3) 0%,
+    transparent 20%,
+    transparent 85%,
+    rgba(10, 15, 26, 0.15) 100%
   );
   pointer-events: none;
 }
