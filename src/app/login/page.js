@@ -126,22 +126,15 @@ export default function Login() {
               <label htmlFor="login-email" className="form-label">
                 TCS Email Address
               </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  id="login-email"
-                  className="form-control"
-                  placeholder=""
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  style={{ paddingLeft: '38px' }}
-                />
-                <span className="material-icons" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.1rem', color: '#6e7681' }}>
-                  alternate_email
-                </span>
-              </div>
+              <input
+                type="text"
+                id="login-email"
+                className="form-control"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
               <div style={{ fontSize: '0.74rem', color: '#6e7681', marginTop: '4px' }}>
                 Enter your TCS email or username (e.g. <em>john.doe</em>)
               </div>
@@ -161,21 +154,15 @@ export default function Login() {
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="login-password"
-                  className="form-control"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                  style={{ paddingLeft: '38px', paddingRight: '38px' }}
-                />
-                <span className="material-icons" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.1rem', color: '#6e7681' }}>
-                  lock
-                </span>
-              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="login-password"
+                className="form-control"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
             </div>
 
             {/* Submit Button */}
