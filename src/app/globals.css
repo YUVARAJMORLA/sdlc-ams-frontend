@@ -1422,6 +1422,29 @@ select option {
   background: linear-gradient(145deg, rgba(13, 22, 18, 0.92) 0%, rgba(10, 16, 26, 0.88) 60%, rgba(26, 127, 55, 0.4) 100%);
 }
 
+.auth-showcase-signin-img {
+  opacity: 1 !important;
+  object-fit: cover;
+  object-position: center;
+  filter: contrast(1.05) brightness(1.02);
+}
+
+.auth-showcase-overlay-signin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 16, 26, 0.45) 0%,
+    rgba(10, 16, 26, 0.05) 25%,
+    rgba(10, 16, 26, 0.05) 70%,
+    rgba(10, 16, 26, 0.75) 100%
+  );
+  pointer-events: none;
+}
+
 .auth-showcase-overlay-indigo {
   position: absolute;
   top: 0;

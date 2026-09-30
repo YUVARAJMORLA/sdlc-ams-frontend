@@ -55,33 +55,44 @@ export default function Login() {
       <div className="auth-mesh-login" />
 
       <div className="auth-split-container">
-        {/* Left Visual Showcase Panel — Emerald Cyber Theme */}
+        {/* Left Visual Showcase Panel — 3D Autonomous Assessment Showcase */}
         <div className="auth-showcase-panel">
           <img
-            src="/login_illustration.jpg"
-            alt="TCS MaturityIQ AI SDLC Dashboard"
-            className="auth-showcase-bg-img"
+            src="/login_illustration.png"
+            alt="TCS MaturityIQ Autonomous Assessment Showcase"
+            className="auth-showcase-bg-img auth-showcase-signin-img"
           />
-          <div className="auth-showcase-overlay-emerald" />
+          <div className="auth-showcase-overlay-signin" />
 
           <div className="auth-showcase-content">
             {/* Top Brand Tag */}
             <div>
-              <div className="auth-feature-pill" style={{ borderColor: 'rgba(16, 185, 129, 0.3)', background: 'rgba(16, 185, 129, 0.15)' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 10px #34d399' }} />
-                <span style={{ color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.72rem' }}>
+              <div className="auth-feature-pill" style={{ borderColor: 'rgba(56, 189, 248, 0.4)', background: 'rgba(10, 20, 35, 0.75)', backdropFilter: 'blur(10px)' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#38bdf8', boxShadow: '0 0 10px #38bdf8' }} />
+                <span style={{ color: '#7dd3fc', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.72rem', fontWeight: 700 }}>
                   Enterprise AI Platform
                 </span>
               </div>
             </div>
 
-            {/* Middle Feature Highlights */}
-            <div style={{ margin: 'auto 0' }}>
-              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.25, letterSpacing: '-0.03em', marginBottom: '16px' }}>
-                Benchmark Your Engineering &amp; Operations
-              </h2>
-              <p style={{ color: '#a7f3d0', fontSize: '0.95rem', lineHeight: 1.7, maxWidth: '440px', margin: 0, opacity: 0.92 }}>
-                Audit AI maturity across SDLC practices and AMS operational workflows with generative intelligence.
+            {/* Bottom Glass Caption Card */}
+            <div style={{
+              background: 'rgba(10, 16, 26, 0.75)',
+              backdropFilter: 'blur(14px)',
+              border: '1px solid rgba(56, 189, 248, 0.28)',
+              borderRadius: '16px',
+              padding: '16px 20px',
+              marginTop: 'auto',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span className="material-icons" style={{ color: '#38bdf8', fontSize: '1.15rem' }}>auto_awesome</span>
+                <span style={{ color: '#ffffff', fontWeight: 800, fontSize: '0.92rem', letterSpacing: '-0.01em' }}>
+                  Autonomous Assessment Journey
+                </span>
+              </div>
+              <p style={{ color: 'rgba(224, 242, 254, 0.85)', fontSize: '0.8rem', margin: 0, lineHeight: 1.55 }}>
+                Closed-loop telemetry benchmarking SDLC engineering &amp; AMS operational workflows.
               </p>
             </div>
           </div>
