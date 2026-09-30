@@ -1025,6 +1025,32 @@ select option {
   background: linear-gradient(145deg, #e5eaf0, #d5e0e8);
 }
 
+/* AMS Node specific background colors */
+.pentagon-node-service-mgmt::before,
+.pentagon-node-service-management::before {
+  background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+}
+
+.pentagon-node-incident-mgmt::before,
+.pentagon-node-incident-management::before {
+  background: linear-gradient(145deg, #fff1f2, #ffe4e6);
+}
+
+.pentagon-node-change-mgmt::before,
+.pentagon-node-change-management::before {
+  background: linear-gradient(145deg, #fff7ed, #ffedd5);
+}
+
+.pentagon-node-problem-mgmt::before,
+.pentagon-node-problem-management::before {
+  background: linear-gradient(145deg, #faf5ff, #f3e8ff);
+}
+
+.pentagon-node-release-mgmt::before,
+.pentagon-node-release-management::before {
+  background: linear-gradient(145deg, #ecfdf5, #d1fae5);
+}
+
 .pentagon-node-shine {
   position: absolute;
   width: 40%;

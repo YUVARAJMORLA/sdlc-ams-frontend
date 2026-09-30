@@ -738,12 +738,14 @@ export default function Report({ params }) {
         {/* Detailed Stages Table */}
         <div style={{ marginBottom: '25px' }}>
           <h2 style={{ fontSize: '12pt', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
-            Maturity Breakdown by SDLC Stage
+            Maturity Breakdown by {framework === 'AMS' ? 'AMS Operational Dimension' : 'SDLC Stage'}
           </h2>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ backgroundColor: '#f1f5f9', borderTop: '1px solid #cbd5e1', borderBottom: '2px solid #cbd5e1' }}>
-                <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '9pt', fontWeight: 700, color: '#0f172a' }}>SDLC Stage</th>
+                <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '9pt', fontWeight: 700, color: '#0f172a' }}>
+                  {framework === 'AMS' ? 'AMS Dimension' : 'SDLC Stage'}
+                </th>
                 <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '9pt', fontWeight: 700, color: '#0f172a', width: '120px' }}>Score</th>
                 <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '9pt', fontWeight: 700, color: '#0f172a' }}>Maturity Level</th>
               </tr>
@@ -753,7 +755,9 @@ export default function Report({ params }) {
                 const score = categoryScores[area];
                 const scoreNum = score != null ? score : 0;
                 const lvlName = getLevelName(scoreNum);
-                const colors = ['#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b']; // Requirements, Architecture, Development, Testing, Deployment
+                const amsColors = ['#0ea5e9', '#f43f5e', '#f97316', '#a855f7', '#10b981'];
+                const sdlcColors = ['#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b'];
+                const colors = framework === 'AMS' ? amsColors : sdlcColors;
                 const color = colors[idx] || '#6366f1';
                 return (
                   <tr key={area} style={{ borderBottom: '1px solid #e2e8f0' }}>
@@ -1117,7 +1121,7 @@ export default function Report({ params }) {
                 Domain Maturity Breakdown
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '24px' }}>
-                Score per SDLC domain (0 = Traditional → 5 = Agentic Enterprise) · Click a domain to filter
+                Score per {framework === 'AMS' ? 'AMS operational' : 'SDLC'} domain (0 = Traditional → 5 = Agentic Enterprise) · Click a domain to filter
               </p>
               
               <div className="d-flex flex-column gap-2">
@@ -1125,27 +1129,42 @@ export default function Report({ params }) {
                   const score = categoryScores[area];
                   const scoreNum = score != null ? score : 0;
                   
-                  // Icon mapping
+                  // Icon mapping for both SDLC and AMS
                   const icons = {
                     'Requirements': 'assignment',
                     'Architecture': 'architecture',
                     'Development': 'code',
                     'Testing': 'science',
-                    'Deployment': 'rocket_launch'
+                    'Deployment': 'rocket_launch',
+                    'Service Management': 'support_agent',
+                    'Incident Management': 'warning_amber',
+                    'Change Management': 'published_with_changes',
+                    'Problem Management': 'manage_search',
+                    'Release Management': 'rocket_launch'
                   };
                   const colors = {
                     'Requirements': '#ef4444', // Red
                     'Architecture': '#3b82f6', // Blue
                     'Development': 'rgb(26, 127, 55)', // Dark Green
                     'Testing': '#f59e0b',     // Orange
-                    'Deployment': '#8b5cf6'    // Purple
+                    'Deployment': '#8b5cf6',    // Purple
+                    'Service Management': '#0ea5e9', // Sky blue
+                    'Incident Management': '#f43f5e', // Rose red
+                    'Change Management': '#f97316',   // Orange
+                    'Problem Management': '#a855f7',  // Purple
+                    'Release Management': '#10b981'   // Emerald green
                   };
                   const bgColors = {
                     'Requirements': 'rgba(239, 68, 68, 0.1)',
                     'Architecture': 'rgba(59, 130, 246, 0.1)',
                     'Development': 'rgba(16, 185, 129, 0.1)',
                     'Testing': 'rgba(245, 158, 11, 0.1)',
-                    'Deployment': 'rgba(139, 92, 246, 0.1)'
+                    'Deployment': 'rgba(139, 92, 246, 0.1)',
+                    'Service Management': 'rgba(14, 165, 233, 0.1)',
+                    'Incident Management': 'rgba(244, 63, 94, 0.1)',
+                    'Change Management': 'rgba(249, 115, 22, 0.1)',
+                    'Problem Management': 'rgba(168, 85, 247, 0.1)',
+                    'Release Management': 'rgba(16, 185, 129, 0.1)'
                   };
                   
                   const icon = icons[area] || 'assignment';
@@ -1246,6 +1265,7 @@ export default function Report({ params }) {
                   overallScore={maturityLevelScore}
                   categoryScores={categoryScores}
                   selectedDomain={selectedDomain}
+                  framework={framework}
                   onNodeClick={(name) => {
                     setSelectedDomain(prev => prev === name ? null : name);
                   }}

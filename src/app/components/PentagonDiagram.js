@@ -30,33 +30,72 @@ const LEVEL_COLORS = {
 };
 
 const DOMAIN_COLORS = {
+  // SDLC
   'Requirements': '#ef4444',
   'Architecture': '#3b82f6',
   'Development': '#10b981',
   'Testing': '#f59e0b',
-  'Deployment': '#8b5cf6'
+  'Deployment': '#8b5cf6',
+  // AMS
+  'Service Management': '#0ea5e9',
+  'Incident Management': '#f43f5e',
+  'Change Management': '#f97316',
+  'Problem Management': '#a855f7',
+  'Release Management': '#10b981'
 };
 
 const DOMAIN_GRADIENTS = {
+  // SDLC
   'Requirements': 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
   'Architecture': 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
   'Development': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
   'Testing': 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-  'Deployment': 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+  'Deployment': 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+  // AMS
+  'Service Management': 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+  'Incident Management': 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
+  'Change Management': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+  'Problem Management': 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)',
+  'Release Management': 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
 };
 
-export default function PentagonDiagram({ overallScore, categoryScores, onNodeClick, selectedDomain }) {
+const SDLC_NODES = [
+  { id: 'architecture', name: 'Architecture', top: '11.5%', left: '50%' },
+  { id: 'requirements', name: 'Requirements', top: '36%', left: '15.5%' },
+  { id: 'development', name: 'Development', top: '36%', left: '84.5%' },
+  { id: 'deployment', name: 'Deployment', top: '76%', left: '28.5%' },
+  { id: 'testing', name: 'Testing', top: '76%', left: '71.5%' }
+];
+
+const AMS_NODES = [
+  { id: 'service-mgmt', name: 'Service Management', top: '11.5%', left: '50%' },
+  { id: 'incident-mgmt', name: 'Incident Management', top: '36%', left: '15.5%' },
+  { id: 'change-mgmt', name: 'Change Management', top: '36%', left: '84.5%' },
+  { id: 'problem-mgmt', name: 'Problem Management', top: '76%', left: '28.5%' },
+  { id: 'release-mgmt', name: 'Release Management', top: '76%', left: '71.5%' }
+];
+
+export default function PentagonDiagram({ overallScore, categoryScores, onNodeClick, selectedDomain, framework = 'SDLC' }) {
   const scoreVal = overallScore != null ? overallScore : 0;
 
+  const isAMS = useMemo(() => {
+    if (framework && String(framework).toUpperCase() === 'AMS') return true;
+    if (categoryScores && typeof categoryScores === 'object') {
+      const keys = Object.keys(categoryScores);
+      if (keys.some(k =>
+        k.toLowerCase().includes('management') ||
+        k.toLowerCase().includes('incident') ||
+        k.toLowerCase().includes('service')
+      )) {
+        return true;
+      }
+    }
+    return false;
+  }, [framework, categoryScores]);
+
   const nodeData = useMemo(() => {
-    return [
-      { id: 'architecture', name: 'Architecture', top: '11.5%', left: '50%' },
-      { id: 'requirements', name: 'Requirements', top: '36%', left: '15.5%' },
-      { id: 'development', name: 'Development', top: '36%', left: '84.5%' },
-      { id: 'deployment', name: 'Deployment', top: '76%', left: '28.5%' },
-      { id: 'testing', name: 'Testing', top: '76%', left: '71.5%' }
-    ];
-  }, []);
+    return isAMS ? AMS_NODES : SDLC_NODES;
+  }, [isAMS]);
 
   const flakeData = useMemo(() => {
     return [
@@ -122,9 +161,15 @@ export default function PentagonDiagram({ overallScore, categoryScores, onNodeCl
 
         {/* Nodes */}
         {nodeData.map((node) => {
-          const score = categoryScores ? categoryScores[node.name] : null;
-          const hasScore = score !== undefined && score !== null;
-          const roundedLvl = hasScore ? Math.round(score) : 0;
+          let score = categoryScores ? categoryScores[node.name] : null;
+          if ((score === undefined || score === null) && categoryScores) {
+            const foundKey = Object.keys(categoryScores).find(
+              k => k.trim().toLowerCase() === node.name.trim().toLowerCase()
+            );
+            if (foundKey) score = categoryScores[foundKey];
+          }
+          const hasScore = score !== undefined && score !== null && !isNaN(score);
+          const roundedLvl = hasScore ? Math.round(Number(score)) : 0;
           const isSelected = selectedDomain === node.name;
 
           const nodeColor = DOMAIN_COLORS[node.name] || '#708090';
@@ -154,9 +199,13 @@ export default function PentagonDiagram({ overallScore, categoryScores, onNodeCl
             `
             : `
               .pentagon-node-${node.id}::before {
-                background: #ffffff !important;
+                background: var(--bg-surface, #ffffff) !important;
                 border: 2.5px solid ${nodeColor} !important;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+              }
+              [data-theme="dark"] .pentagon-node-${node.id}::before {
+                background: #161b22 !important;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
               }
               .pentagon-node-${node.id}::after {
                 background: transparent !important;
@@ -187,7 +236,6 @@ export default function PentagonDiagram({ overallScore, categoryScores, onNodeCl
             >
               <style dangerouslySetInnerHTML={{__html: styleInjection}} />
 
-
               <div
                 className={`pentagon-node pentagon-node-${node.id} ${highlightBootstrapClass}`}
                 style={{
@@ -207,11 +255,29 @@ export default function PentagonDiagram({ overallScore, categoryScores, onNodeCl
                 onClick={() => onNodeClick && onNodeClick(node.name)}
               >
                 {isSelected && <div className="pentagon-node-shine"></div>}
-                <span className="pentagon-node-title">{node.name}</span>
-                <span className="pentagon-node-level" style={{ fontWeight: '800' }}>
+                <span
+                  className="pentagon-node-title"
+                  style={{
+                    fontSize: node.name.length > 13 ? '7.5px' : '9px',
+                    lineHeight: 1.15,
+                    maxWidth: '72px',
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '0 2px'
+                  }}
+                >
+                  {node.name}
+                </span>
+                <span
+                  className="pentagon-node-level"
+                  style={{ fontWeight: '800', fontSize: isAMS ? '9px' : '8.5px', marginTop: '2px', lineHeight: 1.1 }}
+                >
                   {hasScore ? `L${roundedLvl}` : 'N/A'}
                 </span>
-                <span className="pentagon-node-subtitle" style={{ opacity: 0.85 }}>
+                <span
+                  className="pentagon-node-subtitle"
+                  style={{ opacity: 0.85, fontSize: isAMS ? '5.5px' : '6px', lineHeight: 1 }}
+                >
                   {hasScore ? LEVEL_LABELS[roundedLvl] : '—'}
                 </span>
               </div>
