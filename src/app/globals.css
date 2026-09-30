@@ -238,7 +238,7 @@ pre {
 
 .btn-premium-outline {
   background: transparent;
-  color: var(--green-bright) !important;
+  color: var(--green-bright);
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.9rem;
@@ -256,7 +256,7 @@ pre {
 .btn-premium-outline:hover {
   background: var(--green-glow);
   border-color: var(--green-primary);
-  color: var(--green-bright) !important;
+  color: var(--green-bright);
   transform: translateY(-1px);
 }
 
@@ -795,13 +795,14 @@ select option {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .domain-card:hover {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 /* Accent Left-Border Cards for Maturity Scale */
@@ -813,6 +814,7 @@ select option {
   transition: background 0.2s ease;
   height: 100%;
 }
+
 .level-card:hover {
   background: var(--bg-elevated);
 }
@@ -832,6 +834,7 @@ select option {
   gap: 6px;
   white-space: nowrap;
 }
+
 .btn-primary-action:hover {
   background: var(--green-bright);
   transform: translateY(-1px);
@@ -852,6 +855,7 @@ select option {
   gap: 6px;
   white-space: nowrap;
 }
+
 .btn-secondary-action:hover {
   background: var(--bg-elevated);
 }
@@ -867,6 +871,7 @@ select option {
 .dropdown-item-premium {
   transition: background var(--transition), color var(--transition);
 }
+
 .dropdown-item-premium:hover {
   background: var(--bg-hover) !important;
   color: var(--text-primary) !important;
@@ -970,10 +975,10 @@ select option {
   border-radius: 50%;
   background: linear-gradient(145deg, #ffffff, #e6e9ec);
   box-shadow:
-      8px 8px 20px rgba(0, 0, 0, 0.08),
-      -8px -8px 20px rgba(255, 255, 255, 0.9),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.8),
-      inset -2px -2px 4px rgba(0, 0, 0, 0.05);
+    8px 8px 20px rgba(0, 0, 0, 0.08),
+    -8px -8px 20px rgba(255, 255, 255, 0.9),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.05);
   z-index: -1;
   transition: all 0.3s ease;
 }
@@ -985,18 +990,18 @@ select option {
   height: 90%;
   border-radius: 50%;
   background: linear-gradient(145deg,
-          rgba(255, 255, 255, 0.8) 0%,
-          rgba(240, 245, 248, 0.6) 50%,
-          rgba(220, 230, 235, 0.4) 100%);
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(240, 245, 248, 0.6) 50%,
+      rgba(220, 230, 235, 0.4) 100%);
   z-index: -1;
 }
 
 .pentagon-node:hover::before {
   box-shadow:
-      12px 12px 30px rgba(0, 0, 0, 0.12),
-      -12px -12px 30px rgba(255, 255, 255, 1),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.9),
-      inset -2px -2px 4px rgba(0, 0, 0, 0.08);
+    12px 12px 30px rgba(0, 0, 0, 0.12),
+    -12px -12px 30px rgba(255, 255, 255, 1),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.08);
 }
 
 /* Node specific background colors */
@@ -1027,8 +1032,8 @@ select option {
   top: 10%;
   left: 15%;
   background: linear-gradient(135deg,
-          rgba(255, 255, 255, 0.8) 0%,
-          rgba(255, 255, 255, 0) 60%);
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0) 60%);
   border-radius: 50%;
   z-index: 2;
   pointer-events: none;
@@ -1109,8 +1114,8 @@ select option {
   border-radius: 12px;
   padding: 6px 9px;
   box-shadow:
-      0 4px 20px rgba(0, 0, 0, 0.08),
-      0 2px 8px rgba(0, 0, 0, 0.04);
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
   z-index: 10;
 }
 
@@ -1146,9 +1151,12 @@ select option {
 
 /* Animations */
 @keyframes pentagon-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%) translateY(0px);
   }
+
   50% {
     transform: translate(-50%, -50%) translateY(-6px);
   }
@@ -1165,31 +1173,39 @@ select option {
     width: 66px;
     height: 66px;
   }
+
   .pentagon-node-title {
     font-size: 7px;
   }
+
   .pentagon-node-level {
     font-size: 6.5px;
   }
+
   .pentagon-node-subtitle {
     font-size: 5px;
   }
+
   .pentagon-center-score {
     width: 90px;
     height: 60px;
     padding-top: 5px;
   }
+
   .pentagon-score-value {
     font-size: 22px;
   }
+
   .pentagon-score-total {
     font-size: 14px;
   }
+
   .pentagon-kpi-indicator {
     width: 110px;
     padding: 4px 8px;
     bottom: -6%;
   }
+
   .pentagon-kpi-value {
     font-size: 11px;
   }
@@ -1204,6 +1220,7 @@ select option {
   margin-bottom: 32px;
   padding: 0 10px;
 }
+
 .stepper-line-track {
   position: absolute;
   left: 10px;
@@ -1212,6 +1229,7 @@ select option {
   background: var(--border-subtle);
   z-index: 1;
 }
+
 .stepper-line-progress {
   position: absolute;
   left: 10px;
@@ -1220,6 +1238,7 @@ select option {
   transition: width 0.3s ease;
   z-index: 2;
 }
+
 .stepper-node-circle {
   width: 32px;
   height: 32px;
@@ -1236,12 +1255,14 @@ select option {
   transition: all 0.3s ease;
   cursor: pointer;
 }
+
 .stepper-node-circle.active {
   background: var(--bg-surface);
   border-color: var(--green-primary);
   color: var(--green-primary);
   box-shadow: 0 0 10px var(--green-glow);
 }
+
 .stepper-node-circle.completed {
   background: var(--green-dim);
   border-color: var(--green-primary);
@@ -1501,6 +1522,3 @@ select option {
   padding: 16px;
   backdrop-filter: blur(12px);
 }
-
-
-

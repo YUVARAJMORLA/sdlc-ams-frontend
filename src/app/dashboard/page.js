@@ -509,31 +509,43 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => setProfileViewMode('overview')}
-                    className="btn-premium-outline"
                     style={{
-                      padding: '7px 16px', fontSize: '0.82rem',
-                      background: profileViewMode === 'overview' ? 'var(--green-primary)' : 'transparent',
-                      color: profileViewMode === 'overview' ? '#ffffff' : 'var(--text-primary)',
-                      borderColor: profileViewMode === 'overview' ? 'var(--green-primary)' : 'var(--border-subtle)',
-                      fontWeight: 600,
+                      padding: '8px 18px', fontSize: '0.84rem',
+                      background: profileViewMode === 'overview' ? 'var(--green-primary)' : 'var(--bg-surface)',
+                      color: profileViewMode === 'overview' ? '#ffffff' : 'var(--text-secondary)',
+                      border: profileViewMode === 'overview' ? '1px solid var(--green-primary)' : '1px solid var(--border)',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      boxShadow: profileViewMode === 'overview' ? '0 2px 8px rgba(26, 127, 55, 0.35)' : 'none',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <span className="material-icons" style={{ fontSize: '1rem', verticalAlign: '-2px', marginRight: '5px' }}>badge</span>
+                    <span className="material-icons" style={{ fontSize: '1.05rem', color: profileViewMode === 'overview' ? '#ffffff' : 'var(--green-primary)' }}>badge</span>
                     Profile Overview
                   </button>
                   <button
                     type="button"
                     onClick={() => setProfileViewMode('edit')}
-                    className="btn-premium-outline"
                     style={{
-                      padding: '7px 16px', fontSize: '0.82rem',
-                      background: profileViewMode === 'edit' ? 'var(--green-primary)' : 'transparent',
-                      color: profileViewMode === 'edit' ? '#ffffff' : 'var(--text-primary)',
-                      borderColor: profileViewMode === 'edit' ? 'var(--green-primary)' : 'var(--border-subtle)',
-                      fontWeight: 600,
+                      padding: '8px 18px', fontSize: '0.84rem',
+                      background: profileViewMode === 'edit' ? 'var(--green-primary)' : 'var(--bg-surface)',
+                      color: profileViewMode === 'edit' ? '#ffffff' : 'var(--text-secondary)',
+                      border: profileViewMode === 'edit' ? '1px solid var(--green-primary)' : '1px solid var(--border)',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      boxShadow: profileViewMode === 'edit' ? '0 2px 8px rgba(26, 127, 55, 0.35)' : 'none',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <span className="material-icons" style={{ fontSize: '1rem', verticalAlign: '-2px', marginRight: '5px' }}>edit</span>
+                    <span className="material-icons" style={{ fontSize: '1.05rem', color: profileViewMode === 'edit' ? '#ffffff' : 'var(--text-muted)' }}>edit</span>
                     Edit Details
                   </button>
                 </div>
