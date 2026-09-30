@@ -79,20 +79,14 @@ export default function Login() {
 
         {/* Right Form Panel — Clean Emerald Auth Vault */}
         <div className="auth-form-panel">
-          <div style={{ marginBottom: '28px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px' }}>
               <img src="/tcs_logo_white.png" alt="TCS Logo" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
                 MaturityIQ
               </span>
             </div>
-
-            <h1 style={{ fontSize: '1.55rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '6px' }}>
-              Sign In to Your Vault
-            </h1>
-            <p style={{ color: '#8b949e', fontSize: '0.86rem', margin: 0 }}>
-              Enter your credentials to access your assessment console
-            </p>
+            <h1 className="visually-hidden">Sign In</h1>
           </div>
 
           {error && (
