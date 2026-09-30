@@ -136,7 +136,7 @@ export default function Login() {
                 autoComplete="email"
               />
               <div style={{ fontSize: '0.74rem', color: '#6e7681', marginTop: '4px' }}>
-                Enter your TCS email or username (e.g. <em>john.doe</em>)
+                Enter your TCS email (@tcs.com)
               </div>
             </div>
 
