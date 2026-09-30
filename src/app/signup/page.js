@@ -119,66 +119,45 @@ export default function Signup() {
       <div className="auth-mesh-signup" />
 
       <div className="auth-split-container">
-        {/* Left Visual Showcase Panel — Cyber-Indigo & Emerald Theme */}
+        {/* Left Visual Showcase Panel — 3D Dual-Framework AI Architecture */}
         <div className="auth-showcase-panel">
           <img
-            src="/signup_illustration.jpg"
-            alt="TCS MaturityIQ Global Command Center"
-            className="auth-showcase-bg-img"
+            src="/signup_illustration.png"
+            alt="TCS MaturityIQ Dual-Framework AI Architecture"
+            className="auth-showcase-bg-img auth-showcase-signup-img"
           />
-          <div className="auth-showcase-overlay-indigo" />
+          <div className="auth-showcase-overlay-signup" />
 
           <div className="auth-showcase-content">
             {/* Top Brand Tag */}
             <div>
-              <div className="auth-feature-pill" style={{ borderColor: 'rgba(99, 102, 241, 0.3)', background: 'rgba(99, 102, 241, 0.15)' }}>
+              <div className="auth-feature-pill" style={{ borderColor: 'rgba(99, 102, 241, 0.4)', background: 'rgba(10, 15, 30, 0.75)', backdropFilter: 'blur(10px)' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#818cf8', boxShadow: '0 0 10px #818cf8' }} />
-                <span style={{ color: '#c7d2fe', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.72rem' }}>
+                <span style={{ color: '#c7d2fe', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.72rem', fontWeight: 700 }}>
                   Enterprise Onboarding
                 </span>
               </div>
             </div>
 
-            {/* Middle Feature Highlights */}
-            <div style={{ margin: '40px 0 28px' }}>
-              <h2 style={{ fontSize: 'clamp(1.7rem, 2.8vw, 2.3rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, letterSpacing: '-0.03em', marginBottom: '14px' }}>
-                Join the AI Maturity Benchmark Network
-              </h2>
-              <p style={{ color: '#c7d2fe', fontSize: '0.92rem', lineHeight: 1.6, maxWidth: '420px', marginBottom: '24px', opacity: 0.9 }}>
-                Equip your delivery teams with automated radar assessments, gap analyses, and GenAI remediation plans.
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div className="auth-feature-card" style={{ borderLeft: '3px solid #6366f1' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span className="material-icons" style={{ color: '#818cf8', fontSize: '1.25rem' }}>hub</span>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Two Precision Frameworks</div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>120 SDLC engineering + 10 AMS operations questions</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="auth-feature-card" style={{ borderLeft: '3px solid #10b981' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span className="material-icons" style={{ color: '#34d399', fontSize: '1.25rem' }}>military_tech</span>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>L0–L5 Maturity Index</div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>From Traditional manual to Autonomous Enterprise</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="auth-feature-card" style={{ borderLeft: '3px solid #38bdf8' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span className="material-icons" style={{ color: '#38bdf8', fontSize: '1.25rem' }}>history_edu</span>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Audit Trail &amp; Team Tracking</div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Project timeline history with verified timestamps</div>
-                    </div>
-                  </div>
-                </div>
+            {/* Bottom Glass Caption Card */}
+            <div style={{
+              background: 'rgba(10, 16, 26, 0.75)',
+              backdropFilter: 'blur(14px)',
+              border: '1px solid rgba(99, 102, 241, 0.28)',
+              borderRadius: '16px',
+              padding: '16px 20px',
+              marginTop: 'auto',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span className="material-icons" style={{ color: '#818cf8', fontSize: '1.15rem' }}>memory</span>
+                <span style={{ color: '#ffffff', fontWeight: 800, fontSize: '0.92rem', letterSpacing: '-0.01em' }}>
+                  Dual-Framework AI Evaluation
+                </span>
               </div>
+              <p style={{ color: 'rgba(224, 242, 254, 0.85)', fontSize: '0.8rem', margin: 0, lineHeight: 1.55 }}>
+                Unified intelligence interconnecting SDLC engineering &amp; AMS operational workflows.
+              </p>
             </div>
           </div>
         </div>
