@@ -76,41 +76,13 @@ export default function Login() {
             </div>
 
             {/* Middle Feature Highlights */}
-            <div style={{ margin: '48px 0 32px' }}>
-              <h2 style={{ fontSize: 'clamp(1.7rem, 2.8vw, 2.3rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, letterSpacing: '-0.03em', marginBottom: '14px' }}>
+            <div style={{ margin: 'auto 0' }}>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.25, letterSpacing: '-0.03em', marginBottom: '16px' }}>
                 Benchmark Your Engineering &amp; Operations
               </h2>
-              <p style={{ color: '#a7f3d0', fontSize: '0.92rem', lineHeight: 1.6, maxWidth: '420px', marginBottom: '24px', opacity: 0.9 }}>
+              <p style={{ color: '#a7f3d0', fontSize: '0.95rem', lineHeight: 1.7, maxWidth: '440px', margin: 0, opacity: 0.92 }}>
                 Audit AI maturity across 120+ SDLC practices and 10 AMS operational workflows with generative intelligence.
               </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div className="auth-feature-card" style={{ borderLeft: '3px solid #10b981' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span className="material-icons" style={{ color: '#34d399', fontSize: '1.25rem' }}>analytics</span>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Pentagon Radar Diagnostics</div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Multi-domain maturity scores plotted on 0–5 scale</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="auth-feature-card" style={{ borderLeft: '3px solid #34d399' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span className="material-icons" style={{ color: '#6ee7b7', fontSize: '1.25rem' }}>psychology</span>
-                    <div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>GenAI Executive Reports</div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Actionable roadmaps powered by Gemini &amp; Claude</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Footer Notice */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#94a3b8', fontSize: '0.78rem' }}>
-              <span className="material-icons" style={{ fontSize: '1rem', color: '#10b981' }}>verified_user</span>
-              <span>Authorized TCS Assessment Portal · Confidential &amp; Encrypted</span>
             </div>
           </div>
         </div>
@@ -118,17 +90,17 @@ export default function Login() {
         {/* Right Form Panel — Clean Emerald Auth Vault */}
         <div className="auth-form-panel">
           <div style={{ marginBottom: '28px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <div style={{
-                width: '36px', height: '36px', borderRadius: '10px',
+                height: '34px', padding: '0 12px', borderRadius: '8px',
                 background: 'linear-gradient(135deg, #1a7f37 0%, #10b981 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontWeight: 900, fontSize: '1.2rem',
+                color: '#fff', fontWeight: 900, fontSize: '0.88rem', letterSpacing: '0.08em',
                 boxShadow: '0 4px 14px rgba(26,127,55,0.4)',
               }}>
-                Σ
+                TCS
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
+              <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
                 TCS MaturityIQ
               </span>
             </div>
@@ -159,7 +131,7 @@ export default function Login() {
                   type="text"
                   id="login-email"
                   className="form-control"
-                  placeholder="firstname.lastname or user@tcs.com"
+                  placeholder=""
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
@@ -194,7 +166,6 @@ export default function Login() {
                   type={showPassword ? 'text' : 'password'}
                   id="login-password"
                   className="form-control"
-                  placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required

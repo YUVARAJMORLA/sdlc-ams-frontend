@@ -180,29 +180,23 @@ export default function Signup() {
                 </div>
               </div>
             </div>
-
-            {/* Bottom Footer Notice */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#94a3b8', fontSize: '0.78rem' }}>
-              <span className="material-icons" style={{ fontSize: '1rem', color: '#6366f1' }}>lock</span>
-              <span>Confidential TCS Internal Assessment System · Strict RBAC Security</span>
-            </div>
           </div>
         </div>
 
         {/* Right Form Panel — 6 Registration Fields */}
         <div className="auth-form-panel">
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
               <div style={{
-                width: '36px', height: '36px', borderRadius: '10px',
+                height: '34px', padding: '0 12px', borderRadius: '8px',
                 background: 'linear-gradient(135deg, #6366f1 0%, #10b981 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontWeight: 900, fontSize: '1.2rem',
+                color: '#fff', fontWeight: 900, fontSize: '0.88rem', letterSpacing: '0.08em',
                 boxShadow: '0 4px 14px rgba(99,102,241,0.4)',
               }}>
-                Σ
+                TCS
               </div>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
+              <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
                 TCS MaturityIQ
               </span>
             </div>
@@ -232,7 +226,6 @@ export default function Signup() {
                   id="signup-name"
                   name="fullName"
                   className="form-control"
-                  placeholder="e.g. John Doe"
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -248,7 +241,6 @@ export default function Signup() {
                   id="signup-empid"
                   name="employeeId"
                   className="form-control"
-                  placeholder="e.g. 2861698"
                   value={formData.employeeId}
                   onChange={handleChange}
                   required
@@ -263,7 +255,6 @@ export default function Signup() {
                   id="signup-email"
                   name="email"
                   className="form-control"
-                  placeholder="firstname.lastname@tcs.com"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -300,7 +291,6 @@ export default function Signup() {
                   id="signup-account"
                   name="account"
                   className="form-control"
-                  placeholder="e.g. BFSI / Core Banking"
                   value={formData.account}
                   onChange={handleChange}
                   required
@@ -324,7 +314,6 @@ export default function Signup() {
                   id="signup-password"
                   name="password"
                   className="form-control"
-                  placeholder="Min. 6 chars"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -347,7 +336,6 @@ export default function Signup() {
                   id="signup-confirm-password"
                   name="confirmPassword"
                   className="form-control"
-                  placeholder="Re-enter password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required

@@ -173,7 +173,14 @@ export default function Navbar() {
             background: 'rgb(26, 127, 55)',
             WebkitBackgroundClip: 'unset', WebkitTextFillColor: '#fff',
             fontWeight: 900,
-          }}>Σ</span>
+            fontSize: '0.74rem',
+            letterSpacing: '0.06em',
+            width: 'auto',
+            padding: '2px 8px',
+            height: '28px',
+            borderRadius: '6px',
+            boxShadow: '0 2px 8px rgba(26, 127, 55, 0.35)',
+          }}>TCS</span>
           <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>TCS MaturityIQ</span>
         </Link>
 

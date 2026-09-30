@@ -30,11 +30,23 @@ const FRAMEWORK_CONFIG = {
   },
 };
 
+const TCS_BUSINESS_GROUPS = [
+  'BFSI (Banking, Financial Services & Insurance)',
+  'Retail, CPG & Travel',
+  'Life Sciences & Healthcare',
+  'Manufacturing',
+  'Communications, Media & Information Services',
+  'Energy, Resources & Utilities',
+  'Technology & Services',
+  'Public Services',
+];
+
 export default function Dashboard() {
   const { user, loading: authLoading, refreshUser } = useAuth();
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [profileViewMode, setProfileViewMode] = useState('overview'); // 'overview' | 'edit'
   const [showFrameworkPicker, setShowFrameworkPicker] = useState(false);
   const [showFullscreenModal, setShowFullscreenModal] = useState(false);
   const [selectedFramework, setSelectedFramework] = useState(null);
@@ -45,10 +57,22 @@ export default function Dashboard() {
 
   // Profile state
   const [profileName, setProfileName] = useState('');
-  const [profileGender, setProfileGender] = useState('');
+  const [profileEmpId, setProfileEmpId] = useState('');
+  const [profileBg, setProfileBg] = useState('');
+  const [profileAccount, setProfileAccount] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState(null);
+
+  const getInitials = (nameStr, emailStr) => {
+    if (nameStr && nameStr.trim()) {
+      const parts = nameStr.trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return nameStr.substring(0, 2).toUpperCase();
+    }
+    if (emailStr) return emailStr.substring(0, 2).toUpperCase();
+    return 'TC';
+  };
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -57,8 +81,10 @@ export default function Dashboard() {
         router.push('/admin');
       } else {
         fetchDashboardData();
-        setProfileName(user.name || '');
-        setProfileGender(user.gender || '');
+        setProfileName(user.fullName || user.name || '');
+        setProfileEmpId(user.employeeId || '');
+        setProfileBg(user.businessGroup || '');
+        setProfileAccount(user.account || '');
       }
     }
   }, [user, authLoading, router]);
@@ -144,12 +170,19 @@ export default function Dashboard() {
       const res = await fetch('/api/users/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: profileName, gender: profileGender }),
+        body: JSON.stringify({
+          fullName: profileName,
+          name: profileName,
+          employeeId: profileEmpId,
+          businessGroup: profileBg,
+          account: profileAccount,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to save profile');
       setProfileSuccess(true);
       await refreshUser();
+      setProfileViewMode('overview');
     } catch (err) {
       setProfileError(err.message || 'Error updating profile');
     } finally {
@@ -458,40 +491,382 @@ export default function Dashboard() {
             </div>
           </>
         ) : (
-          /* ── Profile ── */
+          /* ── Profile & Associate Identity ── */
           <div className="row justify-content-center">
-            <div className="col-lg-6 col-md-8 col-12">
-              <div className="glass-panel" style={{ padding: '32px' }}>
-                <div className="d-flex align-items-center justify-content-between mb-4">
-                  <h3 className="h5 m-0" style={{ color: 'var(--text-primary)' }}>User Profile Settings</h3>
-                  <button onClick={() => { setActiveTab('dashboard'); window.history.pushState(null, '', '/dashboard'); }}
-                    className="btn-premium-outline" style={{ padding: '5px 12px', fontSize: '0.8rem' }}>← Back</button>
-                </div>
-                {profileSuccess && <div className="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert" style={{ fontSize: '0.88rem' }}><span className="material-icons" style={{ fontSize: '1.2rem' }}>check_circle</span> Profile updated successfully!</div>}
-                {profileError   && <div className="alert alert-danger  d-flex align-items-center gap-2 mb-4" role="alert" style={{ fontSize: '0.88rem' }}><span className="material-icons" style={{ fontSize: '1.2rem' }}>warning</span> {profileError}</div>}
-                <form onSubmit={handleProfileSave}>
-                  <div className="mb-3">
-                    <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Email Address</label>
-                    <input type="email" className="form-control" value={user?.email || ''} disabled style={{ opacity: 0.6 }} />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Full Name</label>
-                    <input type="text" className="form-control" value={profileName} onChange={e => setProfileName(e.target.value)} placeholder="Enter your full name" required />
-                  </div>
-                  <div className="mb-4">
-                    <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Gender</label>
-                    <select className="form-select" value={profileGender} onChange={e => setProfileGender(e.target.value)} required>
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <button type="submit" className="btn-premium w-100 justify-content-center" disabled={profileSaving}>
-                    {profileSaving ? 'Saving Changes...' : 'Save Profile'}
+            <div className="col-12 col-xl-10">
+              {/* Top Navigation & View Toggle */}
+              <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                <button
+                  onClick={() => { setActiveTab('dashboard'); window.history.pushState(null, '', '/dashboard'); }}
+                  className="btn-premium-outline d-inline-flex align-items-center gap-2"
+                  style={{ padding: '7px 16px', fontSize: '0.84rem' }}
+                >
+                  <span className="material-icons" style={{ fontSize: '1.05rem' }}>arrow_back</span>
+                  Back to Dashboard
+                </button>
+
+                <div className="d-flex align-items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setProfileViewMode('overview')}
+                    className="btn-premium-outline"
+                    style={{
+                      padding: '7px 16px', fontSize: '0.82rem',
+                      background: profileViewMode === 'overview' ? 'var(--green-primary)' : 'transparent',
+                      color: profileViewMode === 'overview' ? '#ffffff' : 'var(--text-primary)',
+                      borderColor: profileViewMode === 'overview' ? 'var(--green-primary)' : 'var(--border-subtle)',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span className="material-icons" style={{ fontSize: '1rem', verticalAlign: '-2px', marginRight: '5px' }}>badge</span>
+                    Profile Overview
                   </button>
-                </form>
+                  <button
+                    type="button"
+                    onClick={() => setProfileViewMode('edit')}
+                    className="btn-premium-outline"
+                    style={{
+                      padding: '7px 16px', fontSize: '0.82rem',
+                      background: profileViewMode === 'edit' ? 'var(--green-primary)' : 'transparent',
+                      color: profileViewMode === 'edit' ? '#ffffff' : 'var(--text-primary)',
+                      borderColor: profileViewMode === 'edit' ? 'var(--green-primary)' : 'var(--border-subtle)',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span className="material-icons" style={{ fontSize: '1rem', verticalAlign: '-2px', marginRight: '5px' }}>edit</span>
+                    Edit Details
+                  </button>
+                </div>
               </div>
+
+              {/* Status Alert Messages */}
+              {profileSuccess && (
+                <div className="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert" style={{ fontSize: '0.88rem', borderRadius: '10px' }}>
+                  <span className="material-icons" style={{ fontSize: '1.2rem' }}>check_circle</span>
+                  <span>Profile updated successfully! Your enterprise credentials have been synced.</span>
+                </div>
+              )}
+              {profileError && (
+                <div className="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert" style={{ fontSize: '0.88rem', borderRadius: '10px' }}>
+                  <span className="material-icons" style={{ fontSize: '1.2rem' }}>warning</span>
+                  <span>{profileError}</span>
+                </div>
+              )}
+
+              {/* Executive Identity Hero Card */}
+              <div
+                className="glass-panel mb-4"
+                style={{
+                  padding: '28px',
+                  background: 'linear-gradient(135deg, rgba(26, 127, 55, 0.05) 0%, rgba(99, 102, 241, 0.03) 50%, rgba(255, 255, 255, 0.95) 100%)',
+                  border: '1px solid rgba(26, 127, 55, 0.22)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{
+                  position: 'absolute', top: '-40px', right: '-40px',
+                  width: '180px', height: '180px', borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(26, 127, 55, 0.12) 0%, transparent 70%)',
+                  pointerEvents: 'none',
+                }} />
+
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                  <div className="d-flex align-items-center gap-3">
+                    {/* User Avatar Initials with Glow */}
+                    <div style={{
+                      width: '68px', height: '68px', borderRadius: '18px',
+                      background: 'linear-gradient(135deg, #1a7f37 0%, #10b981 100%)',
+                      color: '#ffffff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 800, fontSize: '1.5rem', letterSpacing: '0.04em',
+                      boxShadow: '0 8px 24px rgba(26, 127, 55, 0.28)',
+                      flexShrink: 0,
+                    }}>
+                      {getInitials(user?.fullName || user?.name, user?.email)}
+                    </div>
+
+                    <div>
+                      <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+                        <h2 className="h4 m-0" style={{ color: 'var(--text-primary)', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                          {user?.fullName || user?.name || 'TCS Enterprise User'}
+                        </h2>
+                        <span className="badge" style={{
+                          background: 'rgba(26, 127, 55, 0.12)', color: 'var(--green-primary)',
+                          border: '1px solid rgba(26, 127, 55, 0.3)', padding: '4px 10px',
+                          borderRadius: '20px', fontSize: '0.74rem', fontWeight: 700,
+                        }}>
+                          TCS Enterprise Associate
+                        </span>
+                      </div>
+
+                      <div className="d-flex align-items-center gap-3 flex-wrap text-muted" style={{ fontSize: '0.85rem' }}>
+                        <span className="d-flex align-items-center gap-1">
+                          <span className="material-icons" style={{ fontSize: '1rem', color: 'var(--green-primary)' }}>alternate_email</span>
+                          {user?.email || 'N/A'}
+                        </span>
+                        <span style={{ opacity: 0.4 }}>•</span>
+                        <span className="d-flex align-items-center gap-1">
+                          <span className="material-icons" style={{ fontSize: '1rem', color: '#6366f1' }}>badge</span>
+                          ID: <strong style={{ color: 'var(--text-primary)' }}>{user?.employeeId || 'Not registered'}</strong>
+                        </span>
+                        <span style={{ opacity: 0.4 }}>•</span>
+                        <span className="d-flex align-items-center gap-1">
+                          <span className="material-icons" style={{ fontSize: '1rem', color: '#0ea5e9' }}>hub</span>
+                          Project: <strong style={{ color: 'var(--text-primary)' }}>{user?.account || 'General Enterprise'}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="d-flex align-items-center gap-2">
+                    <button
+                      onClick={() => setProfileViewMode(profileViewMode === 'overview' ? 'edit' : 'overview')}
+                      className="btn-premium"
+                      style={{ padding: '9px 18px', fontSize: '0.84rem' }}
+                    >
+                      <span className="material-icons" style={{ fontSize: '1.1rem' }}>
+                        {profileViewMode === 'overview' ? 'edit' : 'visibility'}
+                      </span>
+                      {profileViewMode === 'overview' ? 'Edit Profile' : 'View Overview'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* View Mode 1: Detailed Attributes Overview */}
+              {profileViewMode === 'overview' && (
+                <div className="row g-3">
+                  {/* Name Card */}
+                  <div className="col-12 col-md-6 col-lg-4">
+                    <div className="glass-panel h-100" style={{ padding: '22px' }}>
+                      <div className="d-flex align-items-center gap-2 mb-2" style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem', color: 'var(--green-primary)' }}>person</span>
+                        Full Name
+                      </div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                        {user?.fullName || user?.name || 'Not provided'}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                        Registered TCS associate name
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Email Card */}
+                  <div className="col-12 col-md-6 col-lg-4">
+                    <div className="glass-panel h-100" style={{ padding: '22px' }}>
+                      <div className="d-flex align-items-center gap-2 mb-2" style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem', color: 'var(--green-primary)' }}>alternate_email</span>
+                        TCS Email Address
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px', wordBreak: 'break-all' }}>
+                        {user?.email || 'N/A'}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--green-primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="material-icons" style={{ fontSize: '0.9rem' }}>verified</span>
+                        Verified TCS Active Directory Account
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Employee ID Card */}
+                  <div className="col-12 col-md-6 col-lg-4">
+                    <div className="glass-panel h-100" style={{ padding: '22px' }}>
+                      <div className="d-flex align-items-center gap-2 mb-2" style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem', color: '#6366f1' }}>badge</span>
+                        Employee ID
+                      </div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px', fontFamily: 'var(--font-mono)' }}>
+                        {user?.employeeId || 'Not registered'}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                        Official TCS Employee Identification
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Account / Project Card */}
+                  <div className="col-12 col-md-6 col-lg-4">
+                    <div className="glass-panel h-100" style={{ padding: '22px' }}>
+                      <div className="d-flex align-items-center gap-2 mb-2" style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem', color: '#0ea5e9' }}>hub</span>
+                        Account / Project
+                      </div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                        {user?.account || 'General Enterprise'}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                        Active Client Delivery Engagement
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Business Group Card */}
+                  <div className="col-12 col-md-6 col-lg-4">
+                    <div className="glass-panel h-100" style={{ padding: '22px' }}>
+                      <div className="d-flex align-items-center gap-2 mb-2" style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem', color: '#f59e0b' }}>domain</span>
+                        Business Group
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                        {user?.businessGroup || 'Not assigned'}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                        TCS Industry Strategic Business Unit
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Security Role & Authority Card */}
+                  <div className="col-12 col-md-6 col-lg-4">
+                    <div className="glass-panel h-100" style={{ padding: '22px' }}>
+                      <div className="d-flex align-items-center gap-2 mb-2" style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                        <span className="material-icons" style={{ fontSize: '1.1rem', color: 'var(--green-primary)' }}>security</span>
+                        Access Role
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                        {user?.role === 'admin' ? 'Administrator' : 'Standard Assessor'}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                        Full Diagnostic &amp; Assessment Authority
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* View Mode 2: Interactive Edit Form */}
+              {profileViewMode === 'edit' && (
+                <div className="glass-panel" style={{ padding: '32px' }}>
+                  <div className="mb-4">
+                    <h3 className="h5 m-0" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+                      Edit Associate Information
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0' }}>
+                      Keep your delivery unit, employee ID, and business group assignments updated.
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleProfileSave}>
+                    <div className="row g-3">
+                      {/* Email (Read Only) */}
+                      <div className="col-12 col-md-6">
+                        <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.86rem' }}>
+                          TCS Email Address
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                          <input
+                            type="email"
+                            className="form-control"
+                            value={user?.email || ''}
+                            disabled
+                            style={{ opacity: 0.7, paddingLeft: '36px', background: 'var(--bg-elevated)' }}
+                          />
+                          <span className="material-icons" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.1rem', color: '#6e7681' }}>
+                            lock
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#6e7681', marginTop: '4px' }}>
+                          Enterprise identity locked to your active TCS session
+                        </div>
+                      </div>
+
+                      {/* Full Name */}
+                      <div className="col-12 col-md-6">
+                        <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.86rem' }}>
+                          Full Name <span style={{ color: 'var(--green-primary)' }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={profileName}
+                          onChange={e => setProfileName(e.target.value)}
+                          placeholder=""
+                          required
+                        />
+                      </div>
+
+                      {/* Employee ID */}
+                      <div className="col-12 col-md-6">
+                        <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.86rem' }}>
+                          TCS Employee ID <span style={{ color: 'var(--green-primary)' }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={profileEmpId}
+                          onChange={e => setProfileEmpId(e.target.value)}
+                          placeholder=""
+                          required
+                        />
+                      </div>
+
+                      {/* Business Group */}
+                      <div className="col-12 col-md-6">
+                        <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.86rem' }}>
+                          Business Group <span style={{ color: 'var(--green-primary)' }}>*</span>
+                        </label>
+                        <select
+                          className="form-select"
+                          value={profileBg}
+                          onChange={e => setProfileBg(e.target.value)}
+                          required
+                        >
+                          <option value="">Select Business Group…</option>
+                          {TCS_BUSINESS_GROUPS.map(bg => (
+                            <option key={bg} value={bg}>{bg}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Account / Project */}
+                      <div className="col-12">
+                        <label className="form-label" style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.86rem' }}>
+                          Account / Project Name <span style={{ color: 'var(--green-primary)' }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={profileAccount}
+                          onChange={e => setProfileAccount(e.target.value)}
+                          placeholder=""
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center justify-content-end gap-2 mt-4 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setProfileViewMode('overview')}
+                        className="btn-premium-outline"
+                        style={{ padding: '8px 20px', fontSize: '0.86rem' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn-premium"
+                        style={{ padding: '8px 24px', fontSize: '0.86rem' }}
+                        disabled={profileSaving}
+                      >
+                        {profileSaving ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" />
+                            Saving Changes…
+                          </>
+                        ) : (
+                          <>
+                            <span className="material-icons" style={{ fontSize: '1.1rem' }}>save</span>
+                            Save Profile Changes
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         )}
