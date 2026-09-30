@@ -1,11 +1,10 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Proxy /api/* requests to the backend.
-  // On Vercel: set NEXT_PUBLIC_API_URL to your deployed backend URL.
-  // Locally:   defaults to http://localhost:3001
+  trailingSlash: false,
+  // Proxy /api/* requests to the backend server-side to eliminate CORS issues.
   async rewrites() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
     return [
       {
         source: '/api/:path*',

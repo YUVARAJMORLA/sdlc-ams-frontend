@@ -23,7 +23,7 @@ const TCS_BUSINESS_GROUPS = [
 
 export default function Signup() {
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     email: '',
     employeeId: '',
     businessGroup: '',
@@ -31,6 +31,7 @@ export default function Signup() {
     password: '',
     confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { signup, user, loading } = useAuth();
@@ -41,37 +42,59 @@ export default function Signup() {
   }, [user, loading, router]);
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!formData.email.endsWith('@tcs.com')) {
-      setError('Please use your official TCS email address (@tcs.com)');
+    const cleanEmail = formData.email.trim();
+    if (!cleanEmail.toLowerCase().endsWith('@tcs.com')) {
+      setError('Please use your official TCS enterprise email address (@tcs.com)');
       return;
     }
-    if (!/^[A-Z0-9]{5,12}$/i.test(formData.employeeId)) {
-      setError('Employee ID must be 5–12 alphanumeric characters');
+
+    if (!formData.fullName.trim()) {
+      setError('Full Name is required');
       return;
     }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+
+    if (!/^[A-Z0-9]{4,15}$/i.test(formData.employeeId.trim())) {
+      setError('Employee ID must be 4–15 alphanumeric characters (e.g. 2861698)');
       return;
     }
+
+    if (!formData.businessGroup) {
+      setError('Please select your TCS Business Group');
+      return;
+    }
+
+    if (!formData.account.trim()) {
+      setError('Account or Project Name is required');
+      return;
+    }
+
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     setSubmitting(true);
-    const res = await signup(formData.email, formData.password, {
-      name: formData.name,
-      employeeId: formData.employeeId,
+    const res = await signup(cleanEmail, formData.password, {
+      fullName: formData.fullName.trim(),
+      name: formData.fullName.trim(),
+      employeeId: formData.employeeId.trim(),
       businessGroup: formData.businessGroup,
-      account: formData.account,
+      account: formData.account.trim(),
     });
+
     if (res && res.success === false) {
       setError(res.message || 'Error creating account');
     }
@@ -80,173 +103,289 @@ export default function Signup() {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <div className="spinner-border" role="status" style={{ color: 'rgb(26, 127, 55)' }}><span className="visually-hidden">Loading…</span></div>
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '65vh' }}>
+        <div className="spinner-border" role="status" style={{ color: '#6366f1' }}>
+          <span className="visually-hidden">Loading…</span>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh', padding: '32px 0' }}>
-      <div style={{ width: '100%', maxWidth: '520px' }}>
+  const passwordsMatch = formData.password && formData.confirmPassword && formData.password === formData.confirmPassword;
 
-        {/* Header */}
-        <div className="text-center" style={{ marginBottom: '28px' }}>
-          <div style={{
-            width: '56px', height: '56px',
-            background: 'rgb(26, 127, 55)',
-            borderRadius: '14px', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', margin: '0 auto 16px',
-            fontSize: '1.6rem', fontWeight: 900, color: '#fff',
-            boxShadow: '0 8px 24px rgba(26,127,55,0.35)',
-          }}>
-            Σ
+  return (
+    <div className="auth-page-signup">
+      {/* Ambient Indigo/Cyan Theme Mesh */}
+      <div className="auth-mesh-signup" />
+
+      <div className="auth-split-container">
+        {/* Left Visual Showcase Panel — Cyber-Indigo & Emerald Theme */}
+        <div className="auth-showcase-panel">
+          <img
+            src="/signup_illustration.jpg"
+            alt="TCS MaturityIQ Global Command Center"
+            className="auth-showcase-bg-img"
+          />
+          <div className="auth-showcase-overlay-indigo" />
+
+          <div className="auth-showcase-content">
+            {/* Top Brand Tag */}
+            <div>
+              <div className="auth-feature-pill" style={{ borderColor: 'rgba(99, 102, 241, 0.3)', background: 'rgba(99, 102, 241, 0.15)' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#818cf8', boxShadow: '0 0 10px #818cf8' }} />
+                <span style={{ color: '#c7d2fe', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.72rem' }}>
+                  Enterprise Onboarding
+                </span>
+              </div>
+            </div>
+
+            {/* Middle Feature Highlights */}
+            <div style={{ margin: '40px 0 28px' }}>
+              <h2 style={{ fontSize: 'clamp(1.7rem, 2.8vw, 2.3rem)', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, letterSpacing: '-0.03em', marginBottom: '14px' }}>
+                Join the AI Maturity Benchmark Network
+              </h2>
+              <p style={{ color: '#c7d2fe', fontSize: '0.92rem', lineHeight: 1.6, maxWidth: '420px', marginBottom: '24px', opacity: 0.9 }}>
+                Equip your delivery teams with automated radar assessments, gap analyses, and GenAI remediation plans.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div className="auth-feature-card" style={{ borderLeft: '3px solid #6366f1' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="material-icons" style={{ color: '#818cf8', fontSize: '1.25rem' }}>hub</span>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Two Precision Frameworks</div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>120 SDLC engineering + 10 AMS operations questions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="auth-feature-card" style={{ borderLeft: '3px solid #10b981' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="material-icons" style={{ color: '#34d399', fontSize: '1.25rem' }}>military_tech</span>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>L0–L5 Maturity Index</div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>From Traditional manual to Autonomous Enterprise</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="auth-feature-card" style={{ borderLeft: '3px solid #38bdf8' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="material-icons" style={{ color: '#38bdf8', fontSize: '1.25rem' }}>history_edu</span>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff' }}>Audit Trail &amp; Team Tracking</div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Project timeline history with verified timestamps</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Footer Notice */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#94a3b8', fontSize: '0.78rem' }}>
+              <span className="material-icons" style={{ fontSize: '1rem', color: '#6366f1' }}>lock</span>
+              <span>Confidential TCS Internal Assessment System · Strict RBAC Security</span>
+            </div>
           </div>
-          <h1 style={{ fontSize: '1.55rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '6px', color: 'var(--text-primary)' }}>
-            Join TCS MaturityIQ
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
-            Register with your TCS credentials to begin your AI maturity assessment
-          </p>
         </div>
 
-        <div className="glass-panel" style={{ padding: '32px' }}>
+        {/* Right Form Panel — 6 Registration Fields */}
+        <div className="auth-form-panel">
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                background: 'linear-gradient(135deg, #6366f1 0%, #10b981 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontWeight: 900, fontSize: '1.2rem',
+                boxShadow: '0 4px 14px rgba(99,102,241,0.4)',
+              }}>
+                Σ
+              </div>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
+                TCS MaturityIQ
+              </span>
+            </div>
+
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '4px' }}>
+              Create Your Account
+            </h1>
+            <p style={{ color: '#8b949e', fontSize: '0.84rem', margin: 0 }}>
+              Register with your TCS enterprise credentials
+            </p>
+          </div>
+
           {error && (
-            <div className="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert" style={{ fontSize: '0.88rem', borderRadius: '10px' }}>
-              <span className="material-icons" style={{ fontSize: '1.2rem' }}>warning</span> {error}
+            <div className="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert" style={{ fontSize: '0.84rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5' }}>
+              <span className="material-icons" style={{ fontSize: '1.15rem' }}>error_outline</span>
+              <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Row 1: Full Name */}
-            <div className="mb-3">
-              <label htmlFor="signup-name" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                Full Name <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-              </label>
-              <input
-                type="text" id="signup-name" name="name"
-                className="form-control"
-                placeholder="e.g. Rahul Sharma"
-                value={formData.name}
-                onChange={handleChange}
-                required autoComplete="name"
-              />
-            </div>
-
-            {/* Row 2: TCS Email */}
-            <div className="mb-3">
-              <label htmlFor="signup-email" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                TCS Email Address <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-              </label>
-              <input
-                type="email" id="signup-email" name="email"
-                className="form-control"
-                placeholder="firstname.lastname@tcs.com"
-                value={formData.email}
-                onChange={handleChange}
-                required autoComplete="email"
-              />
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Must be a valid @tcs.com email</div>
-            </div>
-
-            {/* Row 3: Employee ID + Business Group side by side */}
-            <div className="row g-3 mb-3">
-              <div className="col-md-5">
-                <label htmlFor="signup-empid" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                  Employee ID <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-                </label>
+            <div className="row g-2">
+              {/* Field 1: Full Name */}
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="signup-name" className="form-label">Full Name</label>
                 <input
-                  type="text" id="signup-empid" name="employeeId"
+                  type="text"
+                  id="signup-name"
+                  name="fullName"
                   className="form-control"
-                  placeholder="e.g. 1234567"
-                  value={formData.employeeId}
+                  placeholder="e.g. John Doe"
+                  value={formData.fullName}
                   onChange={handleChange}
-                  required maxLength={12}
+                  required
+                  autoComplete="name"
                 />
               </div>
-              <div className="col-md-7">
-                <label htmlFor="signup-bg" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                  Business Group <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-                </label>
+
+              {/* Field 2: TCS Employee ID */}
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="signup-empid" className="form-label">Employee ID</label>
+                <input
+                  type="text"
+                  id="signup-empid"
+                  name="employeeId"
+                  className="form-control"
+                  placeholder="e.g. 2861698"
+                  value={formData.employeeId}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Field 3: TCS Email Address */}
+              <div className="col-12 mb-2">
+                <label htmlFor="signup-email" className="form-label">TCS Email Address</label>
+                <input
+                  type="email"
+                  id="signup-email"
+                  name="email"
+                  className="form-control"
+                  placeholder="firstname.lastname@tcs.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  autoComplete="email"
+                />
+                <div style={{ fontSize: '0.72rem', color: '#6e7681', marginTop: '3px' }}>
+                  Must be your official enterprise <strong>@tcs.com</strong> address
+                </div>
+              </div>
+
+              {/* Field 4: Business Group */}
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="signup-bg" className="form-label">Business Group</label>
                 <select
-                  id="signup-bg" name="businessGroup"
+                  id="signup-bg"
+                  name="businessGroup"
                   className="form-select"
                   value={formData.businessGroup}
                   onChange={handleChange}
                   required
                 >
-                  <option value="">Select Business Group</option>
+                  <option value="">Select Group…</option>
                   {TCS_BUSINESS_GROUPS.map(bg => (
                     <option key={bg} value={bg}>{bg}</option>
                   ))}
                 </select>
               </div>
+
+              {/* Field 5: Account / Project */}
+              <div className="col-12 col-md-6 mb-2">
+                <label htmlFor="signup-account" className="form-label">Account / Project</label>
+                <input
+                  type="text"
+                  id="signup-account"
+                  name="account"
+                  className="form-control"
+                  placeholder="e.g. BFSI / Core Banking"
+                  value={formData.account}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Field 6: Password */}
+              <div className="col-12 col-md-6 mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <label htmlFor="signup-password" className="form-label" style={{ margin: 0 }}>Password</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ background: 'none', border: 'none', color: '#818cf8', fontSize: '0.74rem', cursor: 'pointer', padding: 0 }}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="signup-password"
+                  name="password"
+                  className="form-control"
+                  placeholder="Min. 6 chars"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {/* Confirm Password */}
+              <div className="col-12 col-md-6 mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <label htmlFor="signup-confirm-password" className="form-label" style={{ margin: 0 }}>Confirm Password</label>
+                  {passwordsMatch && (
+                    <span style={{ fontSize: '0.72rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <span className="material-icons" style={{ fontSize: '0.85rem' }}>check_circle</span> Match
+                    </span>
+                  )}
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="signup-confirm-password"
+                  name="confirmPassword"
+                  className="form-control"
+                  placeholder="Re-enter password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
 
-            {/* Row 4: Account */}
-            <div className="mb-3">
-              <label htmlFor="signup-account" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                Account / Client Name <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-              </label>
-              <input
-                type="text" id="signup-account" name="account"
-                className="form-control"
-                placeholder="e.g. JP Morgan, Walgreens, ABN AMRO"
-                value={formData.account}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* Row 5 & 6: Password fields */}
-            <div className="mb-3">
-              <label htmlFor="signup-password" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                Password <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-              </label>
-              <input
-                type="password" id="signup-password" name="password"
-                className="form-control"
-                placeholder="Minimum 6 characters"
-                value={formData.password}
-                onChange={handleChange}
-                required autoComplete="new-password"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="signup-confirm" className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                Confirm Password <span style={{ color: 'rgb(26, 127, 55)' }}>*</span>
-              </label>
-              <input
-                type="password" id="signup-confirm" name="confirmPassword"
-                className="form-control"
-                placeholder="Repeat your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required autoComplete="new-password"
-              />
-            </div>
-
+            {/* Submit Button */}
             <button
               type="submit"
-              className="btn-premium w-100 justify-content-center"
-              style={{ padding: '12px', fontSize: '0.95rem', background: 'rgb(26, 127, 55)', borderColor: 'rgb(26, 127, 55)' }}
+              className="auth-btn-gradient w-100 mt-2"
               disabled={submitting}
             >
-              {submitting
-                ? <><span className="spinner-border spinner-border-sm me-2" role="status" />Creating account…</>
-                : <><span className="material-icons" style={{ fontSize: '1.1rem' }}>how_to_reg</span> Create Account</>}
+              {submitting ? (
+                <>
+                  <span className="spinner-border spinner-border-sm" role="status" />
+                  Creating Account…
+                </>
+              ) : (
+                <>
+                  <span className="material-icons" style={{ fontSize: '1.15rem' }}>person_add</span>
+                  Complete Registration
+                </>
+              )}
             </button>
           </form>
 
-          <p className="text-center mt-4 mb-0" style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-            Already have an account?{' '}
-            <Link href="/login" style={{ color: 'rgb(26, 127, 55)', fontWeight: 700 }}>Sign in</Link>
-          </p>
+          {/* Bottom Switch to Login */}
+          <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', textAlign: 'center' }}>
+            <p style={{ fontSize: '0.84rem', color: '#8b949e', margin: 0 }}>
+              Already registered?{' '}
+              <Link href="/login" style={{ color: '#818cf8', fontWeight: 700, textDecoration: 'none' }}>
+                Sign in here →
+              </Link>
+            </p>
+          </div>
         </div>
-
-        <p className="text-center mt-4" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          By creating an account you agree to use TCS MaturityIQ for authorised assessment purposes only.
-        </p>
       </div>
     </div>
   );

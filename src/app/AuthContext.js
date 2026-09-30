@@ -11,33 +11,31 @@ export function AuthProvider({ children }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Intercept global fetch to direct /api/* calls straight to the backend
+    // Attach JWT Authorization header to outgoing /api/* requests while relying on same-origin proxy
     if (typeof window !== 'undefined') {
       const originalFetch = window.fetch;
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
       window.fetch = async function (url, options = {}) {
-        let targetUrl = url;
-        // Only rewrite relative /api/* calls — absolute URLs are left as-is
-        if (typeof url === 'string' && url.startsWith('/api/') && apiBase) {
-          targetUrl = `${apiBase}${url}`;
-        }
         const token = sessionStorage.getItem('token');
-        if (token) {
+        if (token && typeof url === 'string' && url.startsWith('/api/')) {
           if (!options.headers) {
             options.headers = {};
           }
           if (options.headers instanceof Headers) {
-            options.headers.set('Authorization', `Bearer ${token}`);
+            if (!options.headers.has('Authorization')) {
+              options.headers.set('Authorization', `Bearer ${token}`);
+            }
           } else if (Array.isArray(options.headers)) {
             const hasAuth = options.headers.some(([k]) => k.toLowerCase() === 'authorization');
             if (!hasAuth) {
               options.headers.push(['Authorization', `Bearer ${token}`]);
             }
           } else {
-            options.headers['Authorization'] = `Bearer ${token}`;
+            if (!options.headers['Authorization'] && !options.headers['authorization']) {
+              options.headers['Authorization'] = `Bearer ${token}`;
+            }
           }
         }
-        return originalFetch(targetUrl, options);
+        return originalFetch(url, options);
       };
     }
     checkUserLoggedIn();
@@ -81,19 +79,19 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem('token', data.token);
       }
       router.push('/dashboard');
-      return { success: true };
+      return { success: true, user: data.user };
     } catch (error) {
       console.warn('Login attempt failed:', error.message);
       return { success: false, message: error.message || 'Login failed' };
     }
   };
 
-  const signup = async (email, password) => {
+  const signup = async (email, password, extraData = {}) => {
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, ...extraData })
       });
       const data = await res.json();
       if (!res.ok || data.success === false) {
@@ -104,7 +102,7 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem('token', data.token);
       }
       router.push('/dashboard');
-      return { success: true };
+      return { success: true, user: data.user };
     } catch (error) {
       console.warn('Signup attempt failed:', error.message);
       return { success: false, message: error.message || 'Signup failed' };
