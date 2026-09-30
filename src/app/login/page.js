@@ -81,7 +81,7 @@ export default function Login() {
                 Benchmark Your Engineering &amp; Operations
               </h2>
               <p style={{ color: '#a7f3d0', fontSize: '0.95rem', lineHeight: 1.7, maxWidth: '440px', margin: 0, opacity: 0.92 }}>
-                Audit AI maturity across 120+ SDLC practices and 10 AMS operational workflows with generative intelligence.
+                Audit AI maturity across SDLC practices and AMS operational workflows with generative intelligence.
               </p>
             </div>
           </div>
