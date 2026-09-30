@@ -39,16 +39,12 @@ export default function RootLayout({ children }) {
                 textAlign: 'center',
               }}>
                 <div className="container d-flex flex-wrap align-items-center justify-content-center gap-3">
-                  <div style={{
-                    height: '28px',
-                    background: '#101b21',
-                    borderRadius: '6px',
-                    padding: '2px 8px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                  }}>
-                    <img src="/tcs_logo.png" alt="TCS Logo" style={{ height: '18px', width: 'auto' }} />
-                  </div>
+                  <img
+                    src="/tcs_logo.png"
+                    alt="TCS Logo"
+                    className="tcs-logo-img"
+                    style={{ height: '22px', width: 'auto', objectFit: 'contain' }}
+                  />
                   <span>
                     © 2026 TCS MaturityIQ &nbsp;·&nbsp; AI Maturity Assessment Platform for SDLC &amp; AMS
                   </span>

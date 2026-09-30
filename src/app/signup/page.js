@@ -186,16 +186,8 @@ export default function Signup() {
         {/* Right Form Panel — 6 Registration Fields */}
         <div className="auth-form-panel">
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <div style={{
-                height: '42px', padding: '4px 12px', borderRadius: '10px',
-                background: '#101b21',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}>
-                <img src="/tcs_logo.png" alt="TCS Logo" style={{ height: '26px', width: 'auto', objectFit: 'contain' }} />
-              </div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '14px', marginBottom: '12px' }}>
+              <img src="/tcs_logo_white.png" alt="TCS Logo" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f0f6fc', letterSpacing: '-0.02em' }}>
                 MaturityIQ
               </span>

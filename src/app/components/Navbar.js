@@ -169,23 +169,13 @@ export default function Navbar() {
       <div className="container d-flex align-items-center h-100" style={{ gap: '0' }}>
         {/* Brand */}
         <Link href="/" className="navbar-brand me-4 d-flex align-items-center gap-2" onClick={() => setMenuOpen(false)}>
-          <div style={{
-            height: '38px',
-            background: '#101b21',
-            borderRadius: '8px',
-            padding: '4px 10px',
-            display: 'flex',
-            alignItems: 'center',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}>
-            <img
-              src="/tcs_logo.png"
-              alt="TCS Logo"
-              style={{ height: '24px', width: 'auto', objectFit: 'contain' }}
-            />
-          </div>
-          <span style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: '1.08rem', letterSpacing: '-0.02em' }}>
+          <img
+            src="/tcs_logo.png"
+            alt="TCS Logo"
+            className="tcs-logo-img"
+            style={{ height: '30px', width: 'auto', objectFit: 'contain' }}
+          />
+          <span style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>
             MaturityIQ
           </span>
         </Link>

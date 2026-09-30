@@ -158,6 +158,17 @@ pre {
   height: 70px;
 }
 
+.tcs-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  transition: filter 0.3s ease, transform 0.2s ease;
+}
+
+[data-theme="dark"] .tcs-logo-img {
+  filter: brightness(0) invert(1);
+}
+
 .nav-logo-icon {
   background: var(--green-primary);
   color: #fff;
