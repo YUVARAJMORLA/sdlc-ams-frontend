@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from './AuthContext';
+import Hero3DBackground from './components/Hero3DBackground';
 
 const SDLC_AREAS = [
   { name: 'Requirements', color: '#da3633', icon: 'checklist',            desc: 'AI-powered idea exploration, backlog refinement, impact analysis, and bidirectional traceability.' },
@@ -49,6 +50,24 @@ export default function Home() {
     fetchCounts();
   }, []);
 
+  const handle3dCardTilt = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -6.5;
+    const rotateY = ((x - centerX) / centerX) * 6.5;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-5px) scale3d(1.015, 1.015, 1.015)`;
+  };
+
+  const handle3dCardReset = (e) => {
+    const card = e.currentTarget;
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale3d(1, 1, 1)';
+    card.style.boxShadow = 'none';
+  };
+
   const dashboardLink = user
     ? (user.role === 'admin' || user.email === 'admin@sdlc.com' ? '/admin' : '/dashboard')
     : null;
@@ -64,41 +83,45 @@ export default function Home() {
         borderRadius: '20px', padding: '80px 40px',
         position: 'relative', overflow: 'hidden', marginBottom: '40px',
       }}>
+        {/* Interactive 3D WebGL Radar Polyhedron & Telemetry Cloud */}
+        <Hero3DBackground />
+
         <div style={{
           position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)',
           width: '600px', height: '320px',
           background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.09) 0%, rgba(99,102,241,0.05) 50%, transparent 70%)',
           pointerEvents: 'none',
+          zIndex: 1,
         }} />
 
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <h1 style={{
+            fontSize: 'clamp(2.2rem, 5.5vw, 3.6rem)', fontWeight: 800,
+            fontFamily: 'var(--font-sans)', letterSpacing: '-0.04em',
+            lineHeight: 1.15, marginBottom: '20px', color: 'var(--text-primary)',
+          }}>
+            Measure. Benchmark.<br />
+            <span style={{ background: 'linear-gradient(135deg, rgb(26, 127, 55) 0%, #1f6feb 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Elevate Your AI Maturity
+            </span>
+          </h1>
 
+          <p style={{ maxWidth: '700px', margin: '0 auto 32px', color: 'var(--text-secondary)', fontSize: '17px', lineHeight: 1.75 }}>
+            Two precision assessment frameworks —{' '}
+            <strong style={{ color: 'rgb(26, 127, 55)' }}>SDLC Intelligence</strong> and{' '}
+            <strong style={{ color: '#6366f1' }}>AMS Intelligence</strong> — to audit your engineering and operations teams across every AI maturity dimension.
+          </p>
 
-        <h1 style={{
-          fontSize: 'clamp(2.2rem, 5.5vw, 3.6rem)', fontWeight: 800,
-          fontFamily: 'var(--font-sans)', letterSpacing: '-0.04em',
-          lineHeight: 1.15, marginBottom: '20px', color: 'var(--text-primary)',
-        }}>
-          Measure. Benchmark.<br />
-          <span style={{ background: 'linear-gradient(135deg, rgb(26, 127, 55) 0%, #1f6feb 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Elevate Your AI Maturity
-          </span>
-        </h1>
-
-        <p style={{ maxWidth: '700px', margin: '0 auto 32px', color: 'var(--text-secondary)', fontSize: '17px', lineHeight: 1.75 }}>
-          Two precision assessment frameworks —{' '}
-          <strong style={{ color: 'rgb(26, 127, 55)' }}>SDLC Intelligence</strong> and{' '}
-          <strong style={{ color: '#6366f1' }}>AMS Intelligence</strong> — to audit your engineering and operations teams across every AI maturity dimension.
-        </p>
-
-        <div className="d-flex justify-content-center gap-3 flex-wrap">
-          {user ? (
-            <Link href={dashboardLink} className="btn-primary-action">Go to Dashboard →</Link>
-          ) : (
-            <>
-              <Link href="/signup" className="btn-primary-action">Get Started Free →</Link>
-              <Link href="/login"  className="btn-secondary-action">Sign In</Link>
-            </>
-          )}
+          <div className="d-flex justify-content-center gap-3 flex-wrap">
+            {user ? (
+              <Link href={dashboardLink} className="btn-primary-action">Go to Dashboard →</Link>
+            ) : (
+              <>
+                <Link href="/signup" className="btn-primary-action">Get Started Free →</Link>
+                <Link href="/login"  className="btn-secondary-action">Sign In</Link>
+              </>
+            )}
+          </div>
         </div>
       </section>
 
@@ -117,11 +140,13 @@ export default function Home() {
               background: 'var(--bg-elevated)', border: '1px solid var(--border)',
               borderRadius: '16px', overflow: 'hidden', height: '100%',
               borderTop: '3px solid rgb(26, 127, 55)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              transition: 'transform 0.15s ease-out, box-shadow 0.2s ease',
               display: 'flex', flexDirection: 'column',
+              transformStyle: 'preserve-3d',
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(16,185,129,0.12)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 20px 40px rgba(16,185,129,0.14)'; }}
+              onMouseMove={handle3dCardTilt}
+              onMouseLeave={handle3dCardReset}
             >
               {/* Image */}
               <div style={{ width: '100%', height: '160px', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
@@ -164,11 +189,13 @@ export default function Home() {
               background: 'var(--bg-elevated)', border: '1px solid var(--border)',
               borderRadius: '16px', overflow: 'hidden', height: '100%',
               borderTop: '3px solid #6366f1',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              transition: 'transform 0.15s ease-out, box-shadow 0.2s ease',
               display: 'flex', flexDirection: 'column',
+              transformStyle: 'preserve-3d',
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(99,102,241,0.12)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 20px 40px rgba(99,102,241,0.14)'; }}
+              onMouseMove={handle3dCardTilt}
+              onMouseLeave={handle3dCardReset}
             >
               {/* Image */}
               <div style={{ width: '100%', height: '160px', overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
@@ -236,10 +263,12 @@ export default function Home() {
                 background: 'var(--bg-elevated)', border: '1px solid var(--border)',
                 borderRadius: '12px', overflow: 'hidden', height: '100%',
                 display: 'flex', flexDirection: 'column', borderTop: `2px solid ${area.color}`,
-                transition: 'transform 0.2s ease',
+                transition: 'transform 0.15s ease-out, box-shadow 0.2s ease',
+                transformStyle: 'preserve-3d',
               }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-3px)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 12px 28px ${area.color}22`; }}
+                onMouseMove={handle3dCardTilt}
+                onMouseLeave={handle3dCardReset}
               >
                 <div style={{ padding: '20px', flexGrow: 1 }}>
                   <div style={{ width: '38px', height: '38px', background: `${area.color}18`, borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
@@ -327,10 +356,12 @@ export default function Home() {
                   background: 'var(--bg-surface)', border: '1px solid var(--border)',
                   borderRadius: '14px', padding: '28px 24px',
                   borderTop: `3px solid ${f.color}`,
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  transition: 'transform 0.15s ease-out, box-shadow 0.2s ease',
+                  transformStyle: 'preserve-3d',
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 16px 40px ${f.color}18`; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 16px 40px ${f.color}18`; }}
+                  onMouseMove={handle3dCardTilt}
+                  onMouseLeave={handle3dCardReset}
                 >
                   {/* Icon */}
                   <div style={{ width: '48px', height: '48px', background: `${f.color}14`, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '18px', flexShrink: 0 }}>
