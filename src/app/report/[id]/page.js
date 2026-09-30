@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useAuth } from '../../AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -295,6 +295,68 @@ const LEVEL_COLORS = {
   5: '#d946ef'
 };
 
+const LEVEL_METADATA = [
+  {
+    level: 0,
+    label: 'L0',
+    title: 'Traditional',
+    color: '#708090',
+    automation: '0% AI',
+    sdlc: 'Manual coding, manual test scripts, manual reviews, and zero AI tool integration.',
+    ams: 'Manual ticketing, reactive incident triage, static runbooks, and manual SLA tracking.',
+    desc: 'Entirely manual engineering and operational workflows.'
+  },
+  {
+    level: 1,
+    label: 'L1',
+    title: 'Assisted',
+    color: '#f59e0b',
+    automation: '15–25% AI',
+    sdlc: 'Inline code autocomplete, conversational syntax lookups, and ad-hoc helper scripts.',
+    ams: 'Knowledge-base search bots, ad-hoc diagnostic CLI scripts, and basic ticket classification.',
+    desc: 'Basic inline autocomplete, chat assistants, and ad-hoc scripts.'
+  },
+  {
+    level: 2,
+    label: 'L2',
+    title: 'Delegated',
+    color: '#06b6d4',
+    automation: '40–50% AI',
+    sdlc: 'AI copilots draft unit tests, generate boilerplate, review PRs, and synthesize user stories.',
+    ams: 'AI drafts ticket responses, classifies incidents, and assists root-cause analysis under human supervision.',
+    desc: 'AI acts as a delegated assistant — drafting artifacts under human review.'
+  },
+  {
+    level: 3,
+    label: 'L3',
+    title: 'Supervised',
+    color: '#6366f1',
+    automation: '65–75% AI',
+    sdlc: 'AI agents execute multi-step refactoring, synthetic data generation, and PR synthesis with approval gates.',
+    ams: 'AI agents execute automated runbooks, orchestrate remediation, and triage alerts under human approval gates.',
+    desc: 'AI agents execute multi-step tasks autonomously with human approval gates.'
+  },
+  {
+    level: 4,
+    label: 'L4',
+    title: 'Autonomous',
+    color: 'rgb(26, 127, 55)',
+    automation: '85–95% AI',
+    sdlc: 'Autonomous feature implementation, automated canary evaluation harnesses, and continuous drift remediation.',
+    ams: 'Automated incident self-healing, predictive anomaly resolution, and proactive capacity scaling.',
+    desc: 'Autonomous workforce execution with automated safety guardrails and evals.'
+  },
+  {
+    level: 5,
+    label: 'L5',
+    title: 'Agentic',
+    color: '#d946ef',
+    automation: '100% Autonomous',
+    sdlc: 'Self-evolving codebase architecture, automated architectural governance, and enterprise agentic mesh.',
+    ams: 'Self-healing enterprise operations, predictive failure prevention, and autonomous release pipelines.',
+    desc: 'Fully autonomous self-optimizing enterprise system with real-time telemetry.'
+  }
+];
 
 export default function Report({ params }) {
   const { user, loading: authLoading } = useAuth();
@@ -309,11 +371,27 @@ export default function Report({ params }) {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [hoveredLevel, setHoveredLevel] = useState(null);
   const fetchingReportId = useRef(null);
   const activeRemarksId = useRef(null);
   const dashboardRef = useRef(null);
   const router = useRouter();
   const { id } = params;
+
+  // Count practices per level across all questions in the assessment
+  const levelPracticeCounts = useMemo(() => {
+    const counts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    if (!assessment?.answers || !questions.length) return counts;
+    questions.forEach(q => {
+      const ans = assessment.answers?.[q.id] || assessment.answers?.[String(q.id)];
+      const lvl = ans?.level != null ? parseInt(ans.level) : 0;
+      if (lvl >= 0 && lvl <= 5) {
+        counts[lvl] = (counts[lvl] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [assessment, questions]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -948,13 +1026,18 @@ export default function Report({ params }) {
         const radius = 50;
         const circumference = 2 * Math.PI * radius;
         const gaugeArc = (300 / 360) * circumference;   // 300-degree sweep
-        // Use levelNumber derived from area-score average (same source as domain cards)
         const displayLevel = Math.min(levelNumber, 5);
         const currentLvl = displayLevel;
-        const filledArc = (displayLevel / 5) * gaugeArc;
         const lvlNames = ['Traditional', 'Assisted', 'Delegated', 'Supervised', 'Autonomous', 'Agentic'];
-        const heroScoreLabel = displayLevel >= 4 ? 'High Maturity' : displayLevel >= 2 ? 'Medium Maturity' : 'Low Maturity';
-        const heroAccentColor = displayLevel >= 4 ? 'rgb(26, 127, 55)' : displayLevel >= 2 ? '#f59e0b' : '#ef4444';
+
+        // Determine which level is currently highlighted/inspected
+        const activeLevel = hoveredLevel !== null ? hoveredLevel : (selectedLevel !== null ? selectedLevel : currentLvl);
+        const isInspecting = selectedLevel !== null || hoveredLevel !== null;
+
+        const filledArc = (activeLevel / 5) * gaugeArc;
+        const activeColor = LEVEL_COLORS[activeLevel] || 'rgb(26, 127, 55)';
+        const heroScoreLabel = activeLevel >= 4 ? 'High Maturity' : activeLevel >= 2 ? 'Medium Maturity' : 'Low Maturity';
+        const heroAccentColor = activeColor;
         return (
           <div className="card glass-panel mb-4 border-0">
             <div className="card-body p-4">
@@ -984,20 +1067,20 @@ export default function Report({ params }) {
                       <circle
                         cx="60" cy="60" r={radius}
                         fill="none"
-                        stroke="url(#gaugeGradient)"
+                        stroke={isInspecting ? activeColor : "url(#gaugeGradient)"}
                         strokeWidth="9"
                         strokeLinecap="round"
                         strokeDasharray={`${filledArc} ${circumference}`}
-                        style={{ transition: 'stroke-dasharray 0.8s ease' }}
+                        style={{ transition: 'stroke-dasharray 0.5s ease, stroke 0.3s ease' }}
                       />
                     </svg>
-                    {/* Center text — shows level label e.g. L3 */}
+                    {/* Center text — shows active level e.g. L3 */}
                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
-                      <div style={{ fontSize: '2.2rem', fontWeight: 900, color: LEVEL_COLORS[displayLevel], lineHeight: 1, letterSpacing: '-0.02em' }}>
-                        L{displayLevel}
+                      <div style={{ fontSize: '2.2rem', fontWeight: 900, color: activeColor, lineHeight: 1, letterSpacing: '-0.02em', transition: 'color 0.3s ease' }}>
+                        L{activeLevel}
                       </div>
                       <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                        {lvlNames[displayLevel]}
+                        {lvlNames[activeLevel]}
                       </div>
                     </div>
                   </div>
@@ -1010,89 +1093,325 @@ export default function Report({ params }) {
                     border: `1.5px solid ${heroAccentColor}`,
                     color: heroAccentColor,
                     background: `${heroAccentColor}12`,
-                    letterSpacing: '0.01em'
+                    letterSpacing: '0.01em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
                   }}>
-                    {heroScoreLabel}
+                    {isInspecting ? `Inspecting L${activeLevel}` : heroScoreLabel}
+                    {selectedLevel !== null && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedLevel(null);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: heroAccentColor,
+                          fontSize: '0.8rem',
+                          padding: 0,
+                          cursor: 'pointer',
+                          lineHeight: 1
+                        }}
+                        title="Reset to Assessed Level"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* ── Vertical divider ── */}
                 <div style={{ width: '1px', alignSelf: 'stretch', background: 'var(--border-subtle)', opacity: 0.6 }} className="d-none d-sm-block" />
 
-                {/* ── Right: Maturity Journey ── */}
+                {/* ── Right: Maturity Journey (Interactive) ── */}
                 <div style={{ flex: 1, minWidth: '260px' }}>
-                  <div style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '3px' }}>
-                    Maturity Journey
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                      Maturity Journey
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <span className="material-icons" style={{ fontSize: '0.9rem', color: 'var(--accent-primary, #6366f1)' }}>touch_app</span>
+                      <span>Click any node to inspect & filter</span>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '22px', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
-                    {getLevelName(displayLevel)}
+
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em', lineHeight: 1.15 }}>
+                      {getLevelName(activeLevel)}
+                    </span>
+                    {activeLevel === currentLvl ? (
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--green-bright, #10b981)', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '2px 8px', borderRadius: '12px' }}>
+                        Assessed Result
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: activeColor, background: `${activeColor}15`, border: `1px solid ${activeColor}30`, padding: '2px 8px', borderRadius: '12px' }}>
+                        Previewing L{activeLevel}
+                      </span>
+                    )}
                   </div>
  
-                  {/* Level Stepper — matches gauge gradient: red rings → blue fill line → level-colored current node */}
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start' }}>
+                  {/* Level Stepper — Interactive clickable bar */}
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', paddingBottom: '4px' }}>
                     {/* Track (gray) — from L0 center to L5 center */}
                     <div style={{
                       position: 'absolute',
-                      top: '15px',
+                      top: '16px',
                       left: 'calc(100% / 12)',
                       right: 'calc(100% / 12)',
-                      height: '3px',
+                      height: '4px',
                       background: 'rgba(148,163,184,0.18)',
                       borderRadius: '2px'
                     }} />
-                    {/* Progress line — snaps from L0 center to currentLvl center */}
+
+                    {/* Progress line — snaps from L0 center to activeLevel center */}
                     <div style={{
                       position: 'absolute',
-                      top: '15px',
+                      top: '16px',
                       left: 'calc(100% / 12)',
-                      width: currentLvl === 0
+                      width: activeLevel === 0
                         ? '0px'
-                        : `calc(${currentLvl} * 100% / 6)`,
-                      height: '3px',
+                        : `calc(${activeLevel} * 100% / 6)`,
+                      height: '4px',
                       background: 'linear-gradient(90deg, #f43f5e, #a855f7, #3b82f6)',
                       borderRadius: '2px',
-                      transition: 'width 0.6s ease'
+                      transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                     }} />
  
-                    {[0,1,2,3,4,5].map(lvl => {
-                      const isActive  = lvl <= currentLvl;
-                      const isCurrent = lvl === currentLvl;
-                      const lvlColor  = LEVEL_COLORS[lvl];
+                    {[0, 1, 2, 3, 4, 5].map(lvl => {
+                      const isAssessed = lvl === currentLvl;
+                      const isSelected = selectedLevel === lvl;
+                      const isHovered  = hoveredLevel === lvl;
+                      const isActive   = lvl <= activeLevel;
+                      const isFocused  = isSelected || isHovered;
+                      const lvlColor   = LEVEL_COLORS[lvl];
+                      const count      = levelPracticeCounts[lvl] || 0;
+
                       return (
-                        <div key={lvl} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-                          <div style={{
-                            width: isCurrent ? '40px' : '30px',
-                            height: isCurrent ? '40px' : '30px',
-                            borderRadius: '50%',
-                            border: `2px solid ${isActive ? '#f43f5e' : 'rgba(148,163,184,0.3)'}`,
-                            background: isCurrent
-                              ? lvlColor
-                              : 'transparent',
+                        <div
+                          key={lvl}
+                          onClick={() => setSelectedLevel(prev => prev === lvl ? null : lvl)}
+                          onMouseEnter={() => setHoveredLevel(lvl)}
+                          onMouseLeave={() => setHoveredLevel(null)}
+                          style={{
+                            flex: 1,
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '0.68rem',
-                            fontWeight: 800,
-                            color: isCurrent ? '#fff' : isActive ? '#f43f5e' : 'var(--text-muted)',
-                            boxShadow: isCurrent ? `0 0 0 4px ${lvlColor}30` : 'none',
-                            transition: 'all 0.25s ease',
-                            marginTop: isCurrent ? '-5px' : '0'
-                          }}>
+                            position: 'relative',
+                            zIndex: 2,
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            padding: '4px 0',
+                            transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                          }}
+                        >
+                          {/* Circular Level Node */}
+                          <div
+                            style={{
+                              width: isFocused ? '42px' : isAssessed ? '38px' : '32px',
+                              height: isFocused ? '42px' : isAssessed ? '38px' : '32px',
+                              borderRadius: '50%',
+                              border: isFocused
+                                ? `3px solid ${lvlColor}`
+                                : isAssessed
+                                  ? `2.5px solid ${lvlColor}`
+                                  : `2px solid ${isActive ? lvlColor : 'rgba(148,163,184,0.3)'}`,
+                              background: isFocused
+                                ? lvlColor
+                                : isAssessed
+                                  ? lvlColor
+                                  : isActive
+                                    ? `${lvlColor}18`
+                                    : 'var(--bg-elevated, #ffffff)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: isFocused ? '0.78rem' : '0.7rem',
+                              fontWeight: 800,
+                              color: isFocused || isAssessed
+                                ? '#ffffff'
+                                : isActive
+                                  ? lvlColor
+                                  : 'var(--text-muted)',
+                              boxShadow: isSelected
+                                ? `0 0 0 5px ${lvlColor}35, 0 6px 16px ${lvlColor}50`
+                                : isHovered
+                                  ? `0 0 0 4px ${lvlColor}25, 0 4px 12px ${lvlColor}40`
+                                  : isAssessed
+                                    ? `0 0 0 3px ${lvlColor}25`
+                                    : 'none',
+                              transform: isFocused
+                                ? 'translateY(-5px) scale(1.1)'
+                                : isAssessed
+                                  ? 'translateY(-2px)'
+                                  : 'translateY(0)',
+                              transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+                            }}
+                          >
                             L{lvl}
                           </div>
+
+                          {/* Level Name */}
                           <div style={{
-                            fontSize: '0.62rem',
-                            fontWeight: isCurrent ? 700 : 500,
-                            color: isCurrent ? lvlColor : isActive ? 'var(--text-secondary)' : 'var(--text-muted)',
-                            marginTop: '7px',
+                            fontSize: isFocused ? '0.68rem' : '0.62rem',
+                            fontWeight: isFocused || isAssessed ? 800 : 600,
+                            color: isFocused
+                              ? lvlColor
+                              : isAssessed
+                                ? lvlColor
+                                : isActive
+                                  ? 'var(--text-secondary)'
+                                  : 'var(--text-muted)',
+                            marginTop: '8px',
                             whiteSpace: 'nowrap',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            transition: 'color 0.2s ease, font-size 0.2s ease'
                           }}>
                             {lvlNames[lvl]}
+                          </div>
+
+                          {/* Bottom Pills (Assessed or Practice Count) */}
+                          <div style={{ marginTop: '3px', height: '16px', display: 'flex', alignItems: 'center' }}>
+                            {isAssessed ? (
+                              <span style={{
+                                fontSize: '0.55rem',
+                                padding: '1px 5px',
+                                borderRadius: '4px',
+                                background: `${lvlColor}25`,
+                                color: lvlColor,
+                                fontWeight: 800,
+                                letterSpacing: '0.02em',
+                                textTransform: 'uppercase'
+                              }}>
+                                Current
+                              </span>
+                            ) : count > 0 ? (
+                              <span style={{
+                                fontSize: '0.55rem',
+                                padding: '1px 5px',
+                                borderRadius: '4px',
+                                background: isFocused ? `${lvlColor}20` : 'rgba(148,163,184,0.12)',
+                                color: isFocused ? lvlColor : 'var(--text-muted)',
+                                fontWeight: 700
+                              }}>
+                                {count} Q
+                              </span>
+                            ) : null}
                           </div>
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* ── Level Interactive Detail Drawer ── */}
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    background: 'var(--bg-surface)',
+                    border: `1.5px solid ${LEVEL_COLORS[activeLevel]}35`,
+                    boxShadow: `0 4px 16px ${LEVEL_COLORS[activeLevel]}10`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontWeight: 800,
+                          fontSize: '0.8rem',
+                          color: '#fff',
+                          background: LEVEL_COLORS[activeLevel],
+                          padding: '2px 8px',
+                          borderRadius: '6px'
+                        }}>
+                          L{activeLevel}
+                        </span>
+                        <span style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-primary)' }}>
+                          {LEVEL_METADATA[activeLevel].title}
+                        </span>
+                        <span style={{
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          color: LEVEL_COLORS[activeLevel],
+                          background: `${LEVEL_COLORS[activeLevel]}18`,
+                          border: `1px solid ${LEVEL_COLORS[activeLevel]}35`,
+                          padding: '1px 8px',
+                          borderRadius: '10px'
+                        }}>
+                          {LEVEL_METADATA[activeLevel].automation}
+                        </span>
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 600,
+                          color: 'var(--text-secondary)'
+                        }}>
+                          • {levelPracticeCounts[activeLevel] || 0} practices scored at this level
+                        </span>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedLevel(prev => prev === activeLevel ? null : activeLevel);
+                            if (dashboardRef.current) {
+                              dashboardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }}
+                          className="btn-premium-outline"
+                          style={{
+                            padding: '3px 12px',
+                            fontSize: '0.74rem',
+                            borderRadius: '16px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <span>{selectedLevel === activeLevel ? '✓ Filtering Dashboard' : 'Filter in Dashboard'}</span>
+                          <span className="material-icons" style={{ fontSize: '0.85rem' }}>arrow_downward</span>
+                        </button>
+
+                        {selectedLevel !== null && (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedLevel(null)}
+                            title="Reset to Assessed Level"
+                            style={{
+                              background: 'none',
+                              border: '1px solid var(--border-subtle)',
+                              borderRadius: '16px',
+                              color: 'var(--text-muted)',
+                              fontSize: '0.72rem',
+                              fontWeight: 600,
+                              padding: '3px 8px',
+                              cursor: 'pointer',
+                              lineHeight: 1.3
+                            }}
+                          >
+                            ✕ Reset
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <p style={{
+                      fontSize: '0.8rem',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.5,
+                      margin: 0
+                    }}>
+                      {framework === 'AMS'
+                        ? LEVEL_METADATA[activeLevel].ams
+                        : LEVEL_METADATA[activeLevel].sdlc}
+                    </p>
                   </div>
                 </div>
 
@@ -1279,10 +1598,18 @@ export default function Report({ params }) {
       {/* ─── Maturity Breakdown & Insights Dashboard ─── */}
       <div ref={dashboardRef} style={{ scrollMarginTop: '84px' }}>
         {assessment && questions.length > 0 && (() => {
-        // Filter questions by selected domain if active
-        const activeQs = selectedDomain
-          ? questions.filter(q => q.area === selectedDomain)
-          : questions;
+        // Filter questions by selected domain and/or selected level if active
+        let activeQs = questions;
+        if (selectedDomain) {
+          activeQs = activeQs.filter(q => q.area === selectedDomain);
+        }
+        if (selectedLevel !== null) {
+          activeQs = activeQs.filter(q => {
+            const ans = assessment.answers?.[q.id] || assessment.answers?.[String(q.id)];
+            const level = ans?.level != null ? parseInt(ans.level) : 0;
+            return level === selectedLevel;
+          });
+        }
         const totalQs    = activeQs.length;
         const activeDist = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         let activeToolCovered = 0;
@@ -1315,7 +1642,7 @@ export default function Report({ params }) {
         const activeToolPct    = totalQs > 0 ? Math.round((activeToolCovered / totalQs) * 100) : 0;
         const activeUniqueTools = Array.from(activeToolSet);
 
-        const distColors = { 0: '#94a3b8', 1: '#f59e0b', 2: '#06b6d4', 3: '#6366f1', 4: '#10b981', 5: '#d946ef' };
+        const distColors = { 0: '#708090', 1: '#f59e0b', 2: '#06b6d4', 3: '#6366f1', 4: 'rgb(26, 127, 55)', 5: '#d946ef' };
         const levelNames = { 0: 'Traditional', 1: 'Assisted', 2: 'Delegated', 3: 'Supervised', 4: 'Autonomous', 5: 'Agentic' };
 
         const NODE_COLORS = {
@@ -1323,7 +1650,12 @@ export default function Report({ params }) {
           Requirements: '#ef4444',
           Development: '#10b981',
           Deployment: '#8b5cf6',
-          Testing: '#f59e0b'
+          Testing: '#f59e0b',
+          'Service Management': '#0ea5e9',
+          'Incident Management': '#f43f5e',
+          'Change Management': '#f97316',
+          'Problem Management': '#a855f7',
+          'Release Management': '#10b981'
         };
         const domainColor = selectedDomain ? (NODE_COLORS[selectedDomain] || '#06b6d4') : null;
 
@@ -1331,26 +1663,60 @@ export default function Report({ params }) {
           <div className="d-flex flex-column gap-4 mb-4" key="insights-dashboard">
 
             {/* Filter badge row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '28px' }}>
-              {selectedDomain ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minHeight: '28px', flexWrap: 'wrap' }}>
+              {(selectedDomain || selectedLevel !== null) ? (
                 <>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Showing:</span>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    fontSize: '0.8rem', fontWeight: 700,
-                    background: `${domainColor}1a`,
-                    color: domainColor,
-                    border: `1px solid ${domainColor}55`,
-                    borderRadius: '20px',
-                    padding: '3px 12px',
-                    letterSpacing: '0.03em'
-                  }}>
-                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: domainColor, display: 'inline-block', boxShadow: `0 0 5px ${domainColor}` }} />
-                    {selectedDomain}
-                  </span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>Filtered by:</span>
+
+                  {selectedDomain && (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '6px',
+                      fontSize: '0.8rem', fontWeight: 700,
+                      background: `${domainColor}1a`,
+                      color: domainColor,
+                      border: `1px solid ${domainColor}55`,
+                      borderRadius: '20px',
+                      padding: '3px 12px',
+                      letterSpacing: '0.03em'
+                    }}>
+                      <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: domainColor, display: 'inline-block', boxShadow: `0 0 5px ${domainColor}` }} />
+                      Domain: {selectedDomain}
+                      <span
+                        onClick={() => setSelectedDomain(null)}
+                        style={{ cursor: 'pointer', marginLeft: '4px', opacity: 0.7 }}
+                        title="Remove domain filter"
+                      >
+                        ✕
+                      </span>
+                    </span>
+                  )}
+
+                  {selectedLevel !== null && (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '6px',
+                      fontSize: '0.8rem', fontWeight: 700,
+                      background: `${LEVEL_COLORS[selectedLevel]}1a`,
+                      color: LEVEL_COLORS[selectedLevel],
+                      border: `1px solid ${LEVEL_COLORS[selectedLevel]}55`,
+                      borderRadius: '20px',
+                      padding: '3px 12px',
+                      letterSpacing: '0.03em'
+                    }}>
+                      <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: LEVEL_COLORS[selectedLevel], display: 'inline-block', boxShadow: `0 0 5px ${LEVEL_COLORS[selectedLevel]}` }} />
+                      Level: L{selectedLevel} · {lvlNames[selectedLevel]} ({activeQs.length} {activeQs.length === 1 ? 'practice' : 'practices'})
+                      <span
+                        onClick={() => setSelectedLevel(null)}
+                        style={{ cursor: 'pointer', marginLeft: '4px', opacity: 0.7 }}
+                        title="Remove level filter"
+                      >
+                        ✕
+                      </span>
+                    </span>
+                  )}
+
                   <button
-                    onClick={() => setSelectedDomain(null)}
-                    title="Reset to overall"
+                    onClick={() => { setSelectedDomain(null); setSelectedLevel(null); }}
+                    title="Reset all filters"
                     style={{
                       background: 'none', border: '1px solid var(--border-subtle)',
                       borderRadius: '20px', cursor: 'pointer',
@@ -1361,12 +1727,12 @@ export default function Report({ params }) {
                     onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--text-secondary)'; }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
                   >
-                    ✕ Reset
+                    ✕ Reset All
                   </button>
                 </>
               ) : (
                 <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                  Overall · All domains · Click any domain breakdown row or pentagon node to filter
+                  Overall · All domains & levels · Click any level node on the stepper bar or domain card to filter
                 </span>
               )}
             </div>
